@@ -1,0 +1,15 @@
+{
+  "root": true,
+  "ignorePatterns": ["node_modules/", "dist/", ".next/"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "plugins": ["@typescript-eslint"],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+      ]
+    }
+  ]
+}
