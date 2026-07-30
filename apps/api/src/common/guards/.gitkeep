@@ -1,0 +1,3 @@
+// Auth & RBAC guards (populated in Phase 2)
+// - JwtAuthGuard — validates access tokens
+// - RolesGuard — enforces role-based access control

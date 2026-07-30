@@ -1,0 +1,2 @@
+// Custom pipes (populated as needed)
+// - ParseUuidPipe — validates and parses UUID params

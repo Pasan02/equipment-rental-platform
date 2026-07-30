@@ -1,0 +1,4 @@
+// Auth & RBAC decorators (populated in Phase 2)
+// - @Roles(...roles) — role-based endpoint protection
+// - @CurrentUser() — extracts user from JWT request
+// - @Public() — marks endpoint as unauthenticated

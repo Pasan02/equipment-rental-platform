@@ -1,0 +1,13 @@
+// Feature modules directory
+// Populated during Phase 2 onwards:
+// - auth/          — Phase 2
+// - users/         — Phase 2
+// - equipment/     — Phase 3
+// - categories/    — Phase 3
+// - reservations/  — Phase 3
+// - payments/      — Phase 3
+// - inventory/     — Phase 4
+// - notifications/ — Phase 4
+// - uploads/       — Phase 4
+// - dashboard/     — Phase 4
+// - activity-logs/ — Phase 2
