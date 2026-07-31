@@ -135,8 +135,21 @@ export class AuthService {
       include: { user: true },
     });
 
-    if (!tokenRecord || tokenRecord.isRevoked || tokenRecord.expiresAt < new Date()) {
+    if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
       throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    if (tokenRecord.isRevoked) {
+      this.logger.warn(
+        `Security Alert: Revoked refresh token reuse attempt detected for user ${tokenRecord.userId}`,
+      );
+      await this.prisma.refreshToken.updateMany({
+        where: { userId: tokenRecord.userId, isRevoked: false },
+        data: { isRevoked: true },
+      });
+      throw new UnauthorizedException(
+        'Refresh token compromise detected. All active sessions have been revoked for security.',
+      );
     }
 
     if (!tokenRecord.user || !tokenRecord.user.isActive) {
@@ -174,7 +187,7 @@ export class AuthService {
         { secret: resetSecret, expiresIn: '1h' },
       );
 
-      this.logger.log(`Password reset token generated for ${user.email}: ${resetToken}`);
+      this.logger.log(`Password reset requested for email: ${user.email}`);
       // In production, nodemailer sends an email with the link `https://app/reset-password?token=${resetToken}`
     }
 
