@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { ActivityAction } from '@prisma/client';
-import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { PaginationQueryDto } from '../../../common/dto/pagination.dto';
 
 export class QueryActivityLogsDto extends PaginationQueryDto {
@@ -21,11 +21,11 @@ export class QueryActivityLogsDto extends PaginationQueryDto {
 
   @ApiPropertyOptional({ description: 'Filter logs created on or after date (YYYY-MM-DD)' })
   @IsOptional()
-  @IsString()
+  @IsDateString({}, { message: 'fromDate must be a valid ISO 8601 date string (YYYY-MM-DD)' })
   fromDate?: string;
 
   @ApiPropertyOptional({ description: 'Filter logs created on or before date (YYYY-MM-DD)' })
   @IsOptional()
-  @IsString()
+  @IsDateString({}, { message: 'toDate must be a valid ISO 8601 date string (YYYY-MM-DD)' })
   toDate?: string;
 }

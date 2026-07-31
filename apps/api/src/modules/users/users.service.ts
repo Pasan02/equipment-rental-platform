@@ -31,6 +31,17 @@ export class UsersService {
     const skip = (page - 1) * pageSize;
     const take = pageSize;
 
+    const allowedSortFields = [
+      'createdAt',
+      'updatedAt',
+      'email',
+      'firstName',
+      'lastName',
+      'role',
+      'isActive',
+    ];
+    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
+
     const where: any = {};
 
     if (role) {
@@ -50,7 +61,7 @@ export class UsersService {
         where,
         skip,
         take,
-        orderBy: { [sortBy]: sortOrder },
+        orderBy: { [safeSortBy]: sortOrder },
         select: {
           id: true,
           email: true,

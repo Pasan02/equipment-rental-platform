@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { Prisma } from '@prisma/client';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -17,7 +18,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const status =
+    let status =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
@@ -43,9 +44,32 @@ export class HttpExceptionFilter implements ExceptionFilter {
           errorCode = resObj.error.toUpperCase().replace(/\s+/g, '_');
         }
       }
+    } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      this.logger.error(`Prisma error [${exception.code}]: ${exception.message}`, exception.stack);
+      switch (exception.code) {
+        case 'P2002': // Unique constraint failed
+          status = HttpStatus.CONFLICT;
+          errorCode = 'DUPLICATE_RESOURCE';
+          message = 'A resource with this unique value already exists';
+          break;
+        case 'P2025': // Record to update/delete not found
+          status = HttpStatus.NOT_FOUND;
+          errorCode = 'NOT_FOUND';
+          message = 'Requested record not found';
+          break;
+        case 'P2003': // Foreign key constraint failed
+          status = HttpStatus.BAD_REQUEST;
+          errorCode = 'FOREIGN_KEY_VIOLATION';
+          message = 'Invalid related entity reference';
+          break;
+        default:
+          status = HttpStatus.INTERNAL_SERVER_ERROR;
+          errorCode = 'DATABASE_ERROR';
+          message = 'A database error occurred';
+      }
     } else if (exception instanceof Error) {
-      message = exception.message;
       this.logger.error(`Unhandled exception: ${exception.message}`, exception.stack);
+      message = process.env.NODE_ENV === 'production' ? 'Internal server error' : exception.message;
     }
 
     if (status === HttpStatus.NOT_FOUND && errorCode === 'INTERNAL_SERVER_ERROR') {

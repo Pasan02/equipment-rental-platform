@@ -45,16 +45,24 @@ export class AuthService {
     const saltRounds = 12;
     const passwordHash = await bcrypt.hash(registerDto.password, saltRounds);
 
-    const user = await this.prisma.user.create({
-      data: {
-        email: registerDto.email.toLowerCase(),
-        passwordHash,
-        firstName: registerDto.firstName,
-        lastName: registerDto.lastName,
-        phone: registerDto.phone || null,
-        role: UserRole.CUSTOMER,
-      },
-    });
+    let user;
+    try {
+      user = await this.prisma.user.create({
+        data: {
+          email: registerDto.email.toLowerCase(),
+          passwordHash,
+          firstName: registerDto.firstName,
+          lastName: registerDto.lastName,
+          phone: registerDto.phone || null,
+          role: UserRole.CUSTOMER,
+        },
+      });
+    } catch (error) {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
+        throw new ConflictException('Email is already registered');
+      }
+      throw error;
+    }
 
     // Create Activity Log
     await this.prisma.activityLog.create({

@@ -56,6 +56,9 @@ export class ActivityLogsService {
     const skip = (page - 1) * pageSize;
     const take = pageSize;
 
+    const allowedSortFields = ['createdAt', 'action', 'entityType'];
+    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
+
     const where: any = {};
 
     if (userId) {
@@ -97,7 +100,7 @@ export class ActivityLogsService {
         where,
         skip,
         take,
-        orderBy: { [sortBy]: sortOrder },
+        orderBy: { [safeSortBy]: sortOrder },
         select: {
           id: true,
           action: true,
