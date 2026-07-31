@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -251,6 +252,10 @@ export class AuthService {
     });
 
     if (tokenRecord) {
+      if (userId && tokenRecord.userId !== userId) {
+        throw new ForbiddenException('You can only revoke your own refresh token');
+      }
+
       await this.prisma.refreshToken.update({
         where: { id: tokenRecord.id },
         data: { isRevoked: true },

@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -96,6 +96,42 @@ describe('AuthService', () => {
         message: 'If the email exists, a password reset link has been sent',
       });
       expect(mockJwtService.sign).toHaveBeenCalled();
+    });
+  });
+
+  describe('SEC-03: Cross-User Token Revocation Security', () => {
+    it('should throw ForbiddenException if user A attempts to revoke user B refresh token in logout', async () => {
+      const foreignTokenRecord = {
+        id: 'token-user-B',
+        userId: 'user-B',
+        token: 'token-belonging-to-user-B',
+        isRevoked: false,
+      };
+
+      mockPrismaService.refreshToken.findUnique.mockResolvedValue(foreignTokenRecord);
+
+      await expect(
+        service.logout({ refreshToken: 'token-belonging-to-user-B' }, 'user-A'),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should allow user to revoke their own refresh token in logout', async () => {
+      const ownTokenRecord = {
+        id: 'token-user-A',
+        userId: 'user-A',
+        token: 'token-belonging-to-user-A',
+        isRevoked: false,
+      };
+
+      mockPrismaService.refreshToken.findUnique.mockResolvedValue(ownTokenRecord);
+      mockPrismaService.refreshToken.update.mockResolvedValue({ ...ownTokenRecord, isRevoked: true });
+
+      const response = await service.logout({ refreshToken: 'token-belonging-to-user-A' }, 'user-A');
+      expect(response).toEqual({ message: 'Logged out successfully' });
+      expect(mockPrismaService.refreshToken.update).toHaveBeenCalledWith({
+        where: { id: 'token-user-A' },
+        data: { isRevoked: true },
+      });
     });
   });
 });
