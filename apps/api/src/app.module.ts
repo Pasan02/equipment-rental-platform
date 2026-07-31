@@ -11,6 +11,8 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+import { AuthModule } from './modules/auth/auth.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,6 +31,7 @@ import { AppService } from './app.service';
       },
     ]),
     PrismaModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
