@@ -41,7 +41,7 @@ export class AuthService {
       throw new ConflictException('Email is already registered');
     }
 
-    const saltRounds = 10;
+    const saltRounds = 12;
     const passwordHash = await bcrypt.hash(registerDto.password, saltRounds);
 
     const user = await this.prisma.user.create({
@@ -210,7 +210,7 @@ export class AuthService {
       throw new BadRequestException('Invalid or expired password reset token');
     }
 
-    const saltRounds = 10;
+    const saltRounds = 12;
     const passwordHash = await bcrypt.hash(resetPasswordDto.newPassword, saltRounds);
 
     await this.prisma.user.update({
