@@ -8,11 +8,13 @@ import { PrismaModule } from './common/prisma/prisma.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { ActivityLogInterceptor } from './common/interceptors/activity-log.interceptor';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { ActivityLogsModule } from './modules/activity-logs/activity-logs.module';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { UsersModule } from './modules/users/users.module';
     PrismaModule,
     AuthModule,
     UsersModule,
+    ActivityLogsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -53,6 +56,10 @@ import { UsersModule } from './modules/users/users.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ActivityLogInterceptor,
     },
   ],
 })
