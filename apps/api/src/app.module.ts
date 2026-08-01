@@ -15,6 +15,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ActivityLogsModule } from './modules/activity-logs/activity-logs.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ActivityLogsModule } from './modules/activity-logs/activity-logs.module
     AuthModule,
     UsersModule,
     ActivityLogsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [
