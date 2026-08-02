@@ -16,6 +16,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ActivityLogsModule } from './modules/activity-logs/activity-logs.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { EquipmentModule } from './modules/equipment/equipment.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
     UsersModule,
     ActivityLogsModule,
     CategoriesModule,
+    EquipmentModule,
   ],
   controllers: [AppController],
   providers: [
