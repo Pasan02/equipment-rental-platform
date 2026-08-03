@@ -31,3 +31,4 @@ uploads/
 coverage/
 docs/
 requirement.txt
+.agents/
