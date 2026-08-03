@@ -18,6 +18,7 @@ import { ActivityLogsModule } from './modules/activity-logs/activity-logs.module
 import { CategoriesModule } from './modules/categories/categories.module';
 import { EquipmentModule } from './modules/equipment/equipment.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ReservationsModule } from './modules/reservations/reservations.module';
     CategoriesModule,
     EquipmentModule,
     ReservationsModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [
