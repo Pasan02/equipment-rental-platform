@@ -20,6 +20,7 @@ import { EquipmentModule } from './modules/equipment/equipment.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { UploadsModule } from './modules/uploads/uploads.module';
     ReservationsModule,
     PaymentsModule,
     UploadsModule,
+    InventoryModule,
   ],
   controllers: [AppController],
   providers: [
