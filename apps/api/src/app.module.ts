@@ -19,6 +19,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { EquipmentModule } from './modules/equipment/equipment.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
     EquipmentModule,
     ReservationsModule,
     PaymentsModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [

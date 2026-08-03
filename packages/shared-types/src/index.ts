@@ -119,6 +119,67 @@ export interface IReservation {
   updatedAt: Date;
 }
 
+export interface IPayment {
+  id: string;
+  reservationId: string;
+  transactionId: string;
+  amount: number;
+  type: PaymentType;
+  status: PaymentStatus;
+  paymentMethod?: string;
+  metadata?: Record<string, any>;
+  paidAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IUpload {
+  id: string;
+  userId: string;
+  reservationId?: string;
+  type: UploadType;
+  fileName: string;
+  fileUrl: string;
+  mimeType: string;
+  fileSize: number;
+  createdAt: Date;
+}
+
+export interface IInventoryLog {
+  id: string;
+  equipmentId: string;
+  userId: string;
+  action: InventoryAction;
+  quantityChange: number;
+  notes?: string;
+  createdAt: Date;
+}
+
+export interface INotification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  isRead: boolean;
+  data?: Record<string, any>;
+  readAt?: Date;
+  createdAt: Date;
+}
+
+export interface IActivityLog {
+  id: string;
+  userId?: string;
+  action: ActivityAction;
+  entityType?: string;
+  entityId?: string;
+  oldValues?: Record<string, any>;
+  newValues?: Record<string, any>;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: Date;
+}
+
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
