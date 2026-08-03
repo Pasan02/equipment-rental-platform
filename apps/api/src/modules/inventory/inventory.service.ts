@@ -189,21 +189,21 @@ export class InventoryService {
    * Record equipment released for pickup (decreases available quantity)
    */
   async release(dto: ReleaseInventoryDto, userId: string) {
-    const equipment = await this.prisma.equipment.findUnique({
-      where: { id: dto.equipmentId },
-    });
-
-    if (!equipment) {
-      throw new NotFoundException(`Equipment with ID "${dto.equipmentId}" not found`);
-    }
-
-    if (equipment.availableQuantity < dto.quantity) {
-      throw new BadRequestException(
-        `Insufficient available quantity to release. Available: ${equipment.availableQuantity}, Requested: ${dto.quantity}`,
-      );
-    }
-
     return this.prisma.$transaction(async (tx) => {
+      const equipment = await tx.equipment.findUnique({
+        where: { id: dto.equipmentId },
+      });
+
+      if (!equipment) {
+        throw new NotFoundException(`Equipment with ID "${dto.equipmentId}" not found`);
+      }
+
+      if (equipment.availableQuantity < dto.quantity) {
+        throw new BadRequestException(
+          `Insufficient available quantity to release. Available: ${equipment.availableQuantity}, Requested: ${dto.quantity}`,
+        );
+      }
+
       const updatedEquipment = await tx.equipment.update({
         where: { id: dto.equipmentId },
         data: {
@@ -352,21 +352,21 @@ export class InventoryService {
    * Record equipment sent to maintenance (decreases available quantity, stock remains unchanged)
    */
   async maintenance(dto: MaintenanceInventoryDto, userId: string) {
-    const equipment = await this.prisma.equipment.findUnique({
-      where: { id: dto.equipmentId },
-    });
-
-    if (!equipment) {
-      throw new NotFoundException(`Equipment with ID "${dto.equipmentId}" not found`);
-    }
-
-    if (equipment.availableQuantity < dto.quantity) {
-      throw new BadRequestException(
-        `Insufficient available stock for maintenance. Available: ${equipment.availableQuantity}, Requested: ${dto.quantity}`,
-      );
-    }
-
     return this.prisma.$transaction(async (tx) => {
+      const equipment = await tx.equipment.findUnique({
+        where: { id: dto.equipmentId },
+      });
+
+      if (!equipment) {
+        throw new NotFoundException(`Equipment with ID "${dto.equipmentId}" not found`);
+      }
+
+      if (equipment.availableQuantity < dto.quantity) {
+        throw new BadRequestException(
+          `Insufficient available stock for maintenance. Available: ${equipment.availableQuantity}, Requested: ${dto.quantity}`,
+        );
+      }
+
       const updatedEquipment = await tx.equipment.update({
         where: { id: dto.equipmentId },
         data: {

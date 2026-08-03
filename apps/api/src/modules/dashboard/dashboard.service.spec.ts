@@ -18,6 +18,7 @@ describe('DashboardService', () => {
     equipment: {
       count: jest.fn(),
       findMany: jest.fn(),
+      aggregate: jest.fn(),
     },
     payment: {
       aggregate: jest.fn(),
@@ -53,9 +54,9 @@ describe('DashboardService', () => {
         return Promise.resolve(0);
       });
       mockPrismaService.equipment.count.mockResolvedValue(85);
-      mockPrismaService.equipment.findMany.mockResolvedValue([
-        { stockQuantity: 10, availableQuantity: 3 },
-      ]);
+      mockPrismaService.equipment.aggregate.mockResolvedValue({
+        _sum: { stockQuantity: 10, availableQuantity: 3 },
+      });
       mockPrismaService.payment.aggregate.mockResolvedValue({
         _sum: { amount: 1000 },
       });

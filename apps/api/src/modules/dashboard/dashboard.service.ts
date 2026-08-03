@@ -26,7 +26,7 @@ export class DashboardService {
       activeReservations,
       pendingReservations,
       totalEquipment,
-      allEquipment,
+      stockAggregate,
       totalRevenueAggregate,
       currentMonthRevenueAggregate,
       prevMonthRevenueAggregate,
@@ -43,9 +43,12 @@ export class DashboardService {
       this.prisma.equipment.count({
         where: { isActive: true },
       }),
-      this.prisma.equipment.findMany({
+      this.prisma.equipment.aggregate({
+        _sum: {
+          stockQuantity: true,
+          availableQuantity: true,
+        },
         where: { isActive: true },
-        select: { stockQuantity: true, availableQuantity: true },
       }),
       this.prisma.payment.aggregate({
         _sum: { amount: true },
@@ -79,13 +82,9 @@ export class DashboardService {
       revenueGrowth = 100.0;
     }
 
-    // Calculate equipment utilization rate percentage
-    let totalStock = 0;
-    let totalAvailable = 0;
-    for (const eq of allEquipment) {
-      totalStock += eq.stockQuantity;
-      totalAvailable += eq.availableQuantity;
-    }
+    // Calculate equipment utilization rate percentage via database aggregation
+    const totalStock = stockAggregate._sum.stockQuantity || 0;
+    const totalAvailable = stockAggregate._sum.availableQuantity || 0;
 
     const equipmentUtilization =
       totalStock > 0

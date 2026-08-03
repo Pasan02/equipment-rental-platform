@@ -29,46 +29,59 @@ export class ScheduledJobsService {
     const tomorrowEnd = new Date(tomorrowStart);
     tomorrowEnd.setHours(23, 59, 59, 999);
 
-    const reservations = await this.prisma.reservation.findMany({
-      where: {
-        status: { in: [ReservationStatus.APPROVED, ReservationStatus.ACTIVE] },
-        returnDate: {
-          gte: tomorrowStart,
-          lte: tomorrowEnd,
+    const BATCH_SIZE = 100;
+    let totalProcessed = 0;
+    let skip = 0;
+
+    while (true) {
+      const reservations = await this.prisma.reservation.findMany({
+        where: {
+          status: { in: [ReservationStatus.APPROVED, ReservationStatus.ACTIVE] },
+          returnDate: {
+            gte: tomorrowStart,
+            lte: tomorrowEnd,
+          },
         },
-      },
-      include: {
-        customer: true,
-      },
-    });
+        include: {
+          customer: true,
+        },
+        take: BATCH_SIZE,
+        skip,
+      });
 
-    this.logger.log(`Found ${reservations.length} reservation(s) due for return tomorrow`);
+      if (reservations.length === 0) break;
 
-    for (const reservation of reservations) {
-      const returnDateStr = reservation.returnDate.toISOString().split('T')[0];
-      const title = 'Upcoming Equipment Return';
-      const message = `Your rental equipment for reservation ${reservation.reservationNumber} is due for return tomorrow (${returnDateStr}).`;
+      for (const reservation of reservations) {
+        const returnDateStr = reservation.returnDate.toISOString().split('T')[0];
+        const title = 'Upcoming Equipment Return';
+        const message = `Your rental equipment for reservation ${reservation.reservationNumber} is due for return tomorrow (${returnDateStr}).`;
 
-      // 1. Create in-app notification
-      await this.notificationsService.createNotification(
-        reservation.customerId,
-        title,
-        message,
-        NotificationType.UPCOMING_RETURN,
-        { reservationId: reservation.id, reservationNumber: reservation.reservationNumber },
-      );
+        // 1. Create in-app notification
+        await this.notificationsService.createNotification(
+          reservation.customerId,
+          title,
+          message,
+          NotificationType.UPCOMING_RETURN,
+          { reservationId: reservation.id, reservationNumber: reservation.reservationNumber },
+        );
 
-      // 2. Send email
-      if (reservation.customer?.email) {
-        await this.mailService.sendUpcomingReturnEmail(reservation.customer.email, {
-          customerName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
-          reservationNumber: reservation.reservationNumber,
-          returnDate: returnDateStr,
-        });
+        // 2. Send email
+        if (reservation.customer?.email) {
+          await this.mailService.sendUpcomingReturnEmail(reservation.customer.email, {
+            customerName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
+            reservationNumber: reservation.reservationNumber,
+            returnDate: returnDateStr,
+          });
+        }
       }
+
+      totalProcessed += reservations.length;
+      if (reservations.length < BATCH_SIZE) break;
+      skip += BATCH_SIZE;
     }
 
-    return { processedCount: reservations.length };
+    this.logger.log(`Completed Upcoming Return Reminders: Processed ${totalProcessed} reservation(s)`);
+    return { processedCount: totalProcessed };
   }
 
   /**
@@ -81,50 +94,66 @@ export class ScheduledJobsService {
     const cutoffDate = new Date();
     cutoffDate.setHours(cutoffDate.getHours() - 48);
 
-    const expiredReservations = await this.prisma.reservation.findMany({
-      where: {
-        status: ReservationStatus.PENDING,
-        createdAt: {
-          lt: cutoffDate,
-        },
-      },
-      include: {
-        customer: true,
-      },
-    });
+    const BATCH_SIZE = 100;
+    let totalProcessed = 0;
 
-    this.logger.log(`Found ${expiredReservations.length} expired pending reservation(s)`);
-
-    for (const reservation of expiredReservations) {
-      await this.prisma.reservation.update({
-        where: { id: reservation.id },
-        data: {
-          status: ReservationStatus.CANCELLED,
-          rejectionReason: 'Auto-cancelled: Expired after 48 hours without approval',
+    while (true) {
+      const expiredReservations = await this.prisma.reservation.findMany({
+        where: {
+          status: ReservationStatus.PENDING,
+          createdAt: {
+            lt: cutoffDate,
+          },
         },
+        include: {
+          customer: true,
+        },
+        take: BATCH_SIZE,
       });
 
-      const title = 'Reservation Expired';
-      const message = `Your reservation ${reservation.reservationNumber} has expired and was auto-cancelled because it was not approved within 48 hours.`;
+      if (expiredReservations.length === 0) break;
 
-      // 1. Create in-app notification
-      await this.notificationsService.createNotification(
-        reservation.customerId,
-        title,
-        message,
-        NotificationType.RESERVATION_EXPIRED,
-        { reservationId: reservation.id, reservationNumber: reservation.reservationNumber },
-      );
-
-      // 2. Send email
-      if (reservation.customer?.email) {
-        await this.mailService.sendReservationExpiredEmail(reservation.customer.email, {
-          customerName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
-          reservationNumber: reservation.reservationNumber,
+      for (const reservation of expiredReservations) {
+        const result = await this.prisma.reservation.updateMany({
+          where: {
+            id: reservation.id,
+            status: ReservationStatus.PENDING,
+          },
+          data: {
+            status: ReservationStatus.CANCELLED,
+            rejectionReason: 'Auto-cancelled: Expired after 48 hours without approval',
+          },
         });
+
+        // Only send notification if status update actually changed the record
+        if (result.count > 0) {
+          const title = 'Reservation Expired';
+          const message = `Your reservation ${reservation.reservationNumber} has expired and was auto-cancelled because it was not approved within 48 hours.`;
+
+          // 1. Create in-app notification
+          await this.notificationsService.createNotification(
+            reservation.customerId,
+            title,
+            message,
+            NotificationType.RESERVATION_EXPIRED,
+            { reservationId: reservation.id, reservationNumber: reservation.reservationNumber },
+          );
+
+          // 2. Send email
+          if (reservation.customer?.email) {
+            await this.mailService.sendReservationExpiredEmail(reservation.customer.email, {
+              customerName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
+              reservationNumber: reservation.reservationNumber,
+            });
+          }
+        }
       }
+
+      totalProcessed += expiredReservations.length;
+      if (expiredReservations.length < BATCH_SIZE) break;
     }
 
-    return { processedCount: expiredReservations.length };
+    this.logger.log(`Completed Expired Reservations Task: Processed ${totalProcessed} reservation(s)`);
+    return { processedCount: totalProcessed };
   }
 }
