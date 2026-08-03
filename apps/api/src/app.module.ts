@@ -20,7 +20,9 @@ import { EquipmentModule } from './modules/equipment/equipment.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
+import { ScheduleModule } from '@nestjs/schedule';
 import { InventoryModule } from './modules/inventory/inventory.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
         abortEarly: true,
       },
     }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
@@ -49,6 +52,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
     PaymentsModule,
     UploadsModule,
     InventoryModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [
