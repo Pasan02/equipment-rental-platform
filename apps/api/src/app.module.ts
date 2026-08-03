@@ -23,6 +23,7 @@ import { UploadsModule } from './modules/uploads/uploads.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     UploadsModule,
     InventoryModule,
     NotificationsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [
