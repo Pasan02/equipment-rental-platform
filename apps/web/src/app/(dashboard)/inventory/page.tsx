@@ -332,23 +332,24 @@ export default function InventoryPage() {
       </div>
 
       {/* Filter Bar */}
-      <Card className="border-slate-800 bg-slate-900/80 p-4">
+      {/* Search Input */}
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm p-4">
         <div className="relative w-full">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search inventory by equipment name or category..."
-            className="pl-9 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+            className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
           />
         </div>
       </Card>
 
       {/* Stock Overview Table */}
-      <Card className="border-slate-800 bg-slate-900/80 shadow-xl overflow-hidden">
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-800 bg-slate-950/60 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600 uppercase tracking-wider">
               <tr>
                 <th className="py-3.5 px-4">Equipment</th>
                 <th className="py-3.5 px-4">Category</th>
@@ -360,24 +361,33 @@ export default function InventoryPage() {
                 <th className="py-3.5 px-4 text-right">Log History</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100">
               {isLoading ? (
-                <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-500">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" /> Loading warehouse inventory...
-                  </td>
-                </tr>
+                Array.from({ length: 5 }).map((_, index) => (
+                  <tr key={index} className="animate-pulse">
+                    <td className="py-4 px-4"><div className="h-4 w-36 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-20 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-12 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-12 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-12 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-12 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-12 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-8 w-16 bg-slate-200 rounded ml-auto" /></td>
+                  </tr>
+                ))
               ) : stockItems.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-slate-500">
-                    <Boxes className="h-8 w-8 mx-auto mb-2 stroke-1" />
-                    <p className="font-medium text-slate-400">No inventory items found.</p>
+                    <div className="flex flex-col items-center justify-center">
+                      <Boxes className="h-10 w-10 text-slate-300 mb-2 stroke-1" />
+                      <p className="text-sm font-semibold text-slate-700">No inventory items found</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
                 stockItems.map((item) => (
-                  <tr key={item.equipmentId} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3.5 px-4 font-semibold text-white">
+                  <tr key={item.equipmentId} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-4 px-4 font-semibold text-slate-900">
                       <div className="flex items-center gap-2">
                         <div
                           className={`h-2.5 w-2.5 rounded-full border ${getStockHealthIndicator(
@@ -389,44 +399,27 @@ export default function InventoryPage() {
                         <span>{item.name}</span>
                       </div>
                     </td>
-
-                    <td className="py-3.5 px-4">
-                      <Badge variant="outline" className="text-xs bg-slate-950 text-slate-300 border-slate-800">
+                    <td className="py-4 px-4">
+                      <Badge variant="secondary" className="text-xs">
                         {item.categoryName}
                       </Badge>
                     </td>
-
-                    <td className="py-3.5 px-4 font-mono font-semibold text-white">
-                      {item.totalStock}
-                    </td>
-
-                    <td className="py-3.5 px-4 font-mono font-bold text-emerald-400">
-                      {item.available}
-                    </td>
-
-                    <td className="py-3.5 px-4 font-mono text-blue-400">
-                      {item.reserved}
-                    </td>
-
-                    <td className="py-3.5 px-4 font-mono text-amber-400">
-                      {item.maintenance}
-                    </td>
-
-                    <td className="py-3.5 px-4 font-mono text-rose-400">
-                      {item.damaged}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-right">
+                    <td className="py-4 px-4 font-semibold text-slate-900">{item.totalStock}</td>
+                    <td className="py-4 px-4 text-emerald-700 font-semibold">{item.available}</td>
+                    <td className="py-4 px-4 text-blue-700 font-semibold">{item.reserved}</td>
+                    <td className="py-4 px-4 text-amber-700 font-semibold">{item.maintenance}</td>
+                    <td className="py-4 px-4 text-rose-700 font-semibold">{item.damaged}</td>
+                    <td className="py-4 px-4 text-right">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 text-xs text-slate-400 hover:text-white gap-1.5"
+                        className="text-xs text-slate-600 hover:text-slate-900"
                         onClick={() => {
                           setHistoryEquipment({ id: item.equipmentId, name: item.name });
                           setHistoryPage(1);
                         }}
                       >
-                        <History className="h-3.5 w-3.5" /> History
+                        <History className="h-3.5 w-3.5 mr-1" /> Logs
                       </Button>
                     </td>
                   </tr>
@@ -450,11 +443,11 @@ export default function InventoryPage() {
             ? "Report Damaged Equipment"
             : "Place Equipment in Maintenance"
         }
-        description="Record warehouse transaction and automatically log audit history."
+        description="Update physical inventory records and trigger stock movement events."
         maxWidth="md"
       >
         {actionError && (
-          <div className="flex items-center gap-2 rounded-lg bg-rose-500/10 border border-rose-500/20 p-3 text-xs text-rose-400 mb-4">
+          <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700 mb-4">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>{actionError}</span>
           </div>
@@ -462,11 +455,11 @@ export default function InventoryPage() {
 
         <form onSubmit={handleActionSubmit} className="space-y-4 text-xs">
           <div className="space-y-1.5">
-            <label className="font-semibold text-slate-300">Select Equipment *</label>
+            <label className="font-semibold text-slate-700">Select Equipment *</label>
             <select
               value={actionForm.equipmentId}
               onChange={(e) => setActionForm({ ...actionForm, equipmentId: e.target.value })}
-              className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-xs"
               required
             >
               {stockItems.map((item) => (
@@ -478,34 +471,34 @@ export default function InventoryPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="font-semibold text-slate-300">Quantity *</label>
+            <label className="font-semibold text-slate-700">Quantity *</label>
             <Input
               type="number"
               min="1"
               value={actionForm.quantity}
               onChange={(e) => setActionForm({ ...actionForm, quantity: e.target.value })}
-              className="bg-slate-950 border-slate-800 text-white"
+              className="bg-white border-slate-300 text-slate-900"
               required
             />
           </div>
 
           {activeModal === "DAMAGE" && (
-            <div className="space-y-3 p-3 rounded-lg bg-slate-950 border border-slate-800">
-              <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+            <div className="space-y-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={actionForm.chargeDamageFee}
                   onChange={(e) =>
                     setActionForm({ ...actionForm, chargeDamageFee: e.target.checked })
                   }
-                  className="rounded border-slate-800 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span>Charge Damage Fee Payment Record</span>
               </label>
 
               {actionForm.chargeDamageFee && (
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-300 block">Damage Fee Amount ($)</label>
+                  <label className="font-semibold text-slate-700 block">Damage Fee Amount ($)</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -514,7 +507,7 @@ export default function InventoryPage() {
                     onChange={(e) =>
                       setActionForm({ ...actionForm, damageFeeAmount: e.target.value })
                     }
-                    className="bg-slate-900 border-slate-800 text-white"
+                    className="bg-white border-slate-300 text-slate-900"
                   />
                 </div>
               )}
@@ -522,17 +515,17 @@ export default function InventoryPage() {
           )}
 
           <div className="space-y-1.5">
-            <label className="font-semibold text-slate-300">Warehouse Notes</label>
+            <label className="font-semibold text-slate-700">Warehouse Notes</label>
             <textarea
               rows={3}
               value={actionForm.notes}
               onChange={(e) => setActionForm({ ...actionForm, notes: e.target.value })}
               placeholder="Record inspection details, shipment numbers, or damage severity..."
-              className="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-300 bg-white p-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
             <Button type="button" variant="ghost" onClick={closeModal}>
               Cancel
             </Button>
@@ -540,10 +533,10 @@ export default function InventoryPage() {
               type="submit"
               className={
                 activeModal === "DAMAGE"
-                  ? "bg-rose-600 hover:bg-rose-500 text-white"
+                  ? "bg-rose-600 hover:bg-rose-700 text-white"
                   : activeModal === "MAINTENANCE"
-                  ? "bg-amber-600 hover:bg-amber-500 text-white"
-                  : "bg-blue-600 hover:bg-blue-500 text-white"
+                  ? "bg-amber-600 hover:bg-amber-700 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
               }
               isLoading={actionMutation.isPending}
             >
@@ -563,13 +556,13 @@ export default function InventoryPage() {
       >
         <div className="space-y-4 text-xs">
           {isLoadingHistory ? (
-            <div className="py-8 text-center text-slate-500">
+            <div className="py-8 text-center text-slate-400">
               <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2" /> Loading history...
             </div>
           ) : !historyData || historyData.items.length === 0 ? (
-            <p className="py-8 text-center text-slate-500">No inventory history logs for this item.</p>
+            <p className="py-8 text-center text-slate-400">No inventory history logs for this item.</p>
           ) : (
-            <div className="divide-y divide-slate-800 border border-slate-800 rounded-lg bg-slate-950 overflow-hidden">
+            <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl bg-white overflow-hidden">
               {historyData.items.map((log) => (
                 <div key={log.id} className="p-3.5 flex items-center justify-between">
                   <div className="space-y-1">
@@ -577,12 +570,12 @@ export default function InventoryPage() {
                       <Badge variant={getActionBadgeVariant(log.action)} className="text-[10px] px-2 py-0">
                         {log.action}
                       </Badge>
-                      <span className="font-semibold text-white">
+                      <span className="font-semibold text-slate-900">
                         Quantity Change: {log.quantityChange > 0 ? `+${log.quantityChange}` : log.quantityChange}
                       </span>
                     </div>
-                    {log.notes && <p className="text-slate-400">{log.notes}</p>}
-                    <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                    {log.notes && <p className="text-slate-600">{log.notes}</p>}
+                    <div className="flex items-center gap-2 text-[10px] text-slate-400">
                       <User className="h-3 w-3" />
                       <span>
                         {log.user ? `${log.user.firstName} ${log.user.lastName}` : "Warehouse Staff"}
@@ -599,7 +592,7 @@ export default function InventoryPage() {
 
           {/* History Pagination */}
           {historyData && historyData.meta.totalPages > 1 && (
-            <div className="flex items-center justify-between pt-2 text-slate-400">
+            <div className="flex items-center justify-between pt-2 text-slate-600">
               <span>
                 Page {historyData.meta.page} of {historyData.meta.totalPages}
               </span>
@@ -609,7 +602,7 @@ export default function InventoryPage() {
                   size="sm"
                   disabled={!historyData.meta.hasPrevPage}
                   onClick={() => setHistoryPage(historyPage - 1)}
-                  className="h-7 text-xs border-slate-800 bg-slate-900"
+                  className="h-7 text-xs border-slate-300 bg-white"
                 >
                   Prev
                 </Button>
@@ -618,7 +611,7 @@ export default function InventoryPage() {
                   size="sm"
                   disabled={!historyData.meta.hasNextPage}
                   onClick={() => setHistoryPage(historyPage + 1)}
-                  className="h-7 text-xs border-slate-800 bg-slate-900"
+                  className="h-7 text-xs border-slate-300 bg-white"
                 >
                   Next
                 </Button>

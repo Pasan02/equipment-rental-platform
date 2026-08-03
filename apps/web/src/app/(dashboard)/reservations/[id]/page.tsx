@@ -202,7 +202,7 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
       {/* Navigation Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <Link href="/reservations">
-          <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white gap-2 cursor-pointer">
+          <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900 gap-2 cursor-pointer">
             <ArrowLeft className="h-4 w-4" /> Back to Reservations
           </Button>
         </Link>
@@ -214,20 +214,20 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
       </div>
 
       {/* Title & Metadata Banner */}
-      <Card className="border-slate-800 bg-slate-900/80 p-6">
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <span className="text-xs text-slate-400 font-mono">Reservation Number</span>
-            <h1 className="text-2xl font-bold font-heading text-white font-mono mt-0.5">
+            <h1 className="text-2xl font-extrabold font-heading text-slate-900 font-mono mt-0.5">
               {reservation.reservationNumber}
             </h1>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Created on {formatDateTime(reservation.createdAt)}
             </p>
           </div>
           <div className="text-left md:text-right">
-            <span className="text-xs text-slate-400 font-medium block">Rental Duration</span>
-            <span className="text-base font-semibold text-blue-400">
+            <span className="text-xs text-slate-500 font-medium block">Rental Duration</span>
+            <span className="text-base font-semibold text-blue-600">
               {formatDate(reservation.pickupDate)} — {formatDate(reservation.returnDate)}
             </span>
           </div>
@@ -235,21 +235,21 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
 
         {/* Timeline Progress Step Indicator */}
         {!["REJECTED", "CANCELLED"].includes(reservation.status) && (
-          <div className="mt-8 pt-6 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="mt-8 pt-6 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-4">
             {steps.map((step, idx) => (
               <div key={idx} className="flex items-center gap-2">
                 <div
                   className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold ${
                     step.done
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                      : "bg-slate-800 text-slate-500"
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "bg-slate-100 text-slate-400"
                   }`}
                 >
                   {idx + 1}
                 </div>
                 <span
-                  className={`text-xs font-medium ${
-                    step.done ? "text-white" : "text-slate-500"
+                  className={`text-xs font-semibold ${
+                    step.done ? "text-slate-900" : "text-slate-400"
                   }`}
                 >
                   {step.title}
@@ -264,39 +264,39 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Customer & Financial Info (1 col) */}
         <div className="space-y-6">
-          <Card className="border-slate-800 bg-slate-900/80 p-5">
-            <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2 font-heading">
-              <User className="h-4 w-4 text-blue-400" /> Customer Information
+          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm p-5">
+            <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2 font-heading">
+              <User className="h-4 w-4 text-blue-600" /> Customer Information
             </h3>
             {reservation.customer ? (
-              <div className="space-y-2 text-xs text-slate-300">
-                <p className="font-semibold text-white text-sm">
+              <div className="space-y-2 text-xs text-slate-700">
+                <p className="font-bold text-slate-900 text-sm">
                   {reservation.customer.firstName} {reservation.customer.lastName}
                 </p>
-                <p className="text-slate-400">{reservation.customer.email}</p>
-                <p className="text-slate-400">{reservation.customer.phone}</p>
+                <p className="text-slate-500">{reservation.customer.email}</p>
+                <p className="text-slate-500">{reservation.customer.phone}</p>
               </div>
             ) : (
-              <p className="text-xs text-slate-500">Customer profile unavailable.</p>
+              <p className="text-xs text-slate-400">Customer profile unavailable.</p>
             )}
           </Card>
 
-          <Card className="border-slate-800 bg-slate-900/80 p-5">
-            <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2 font-heading">
-              <DollarSign className="h-4 w-4 text-emerald-400" /> Financial Summary
+          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm p-5">
+            <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2 font-heading">
+              <DollarSign className="h-4 w-4 text-emerald-600" /> Financial Summary
             </h3>
             <div className="space-y-2.5 text-xs">
-              <div className="flex justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">Rental Total</span>
-                <span className="font-semibold text-white">{formatCurrency(reservation.totalAmount)}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100">
+                <span className="text-slate-500">Rental Total</span>
+                <span className="font-semibold text-slate-900">{formatCurrency(reservation.totalAmount)}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">Security Deposit</span>
-                <span className="font-semibold text-slate-300">{formatCurrency(reservation.depositTotal)}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100">
+                <span className="text-slate-500">Security Deposit</span>
+                <span className="font-semibold text-slate-700">{formatCurrency(reservation.depositTotal)}</span>
               </div>
               <div className="flex justify-between pt-1">
-                <span className="font-bold text-white">Grand Total</span>
-                <span className="font-bold text-blue-400 text-sm">
+                <span className="font-bold text-slate-900">Grand Total</span>
+                <span className="font-bold text-blue-600 text-sm">
                   {formatCurrency(Number(reservation.totalAmount) + Number(reservation.depositTotal))}
                 </span>
               </div>
@@ -306,15 +306,15 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
 
         {/* Reserved Items & Uploads (2 cols) */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border-slate-800 bg-slate-900/80 p-5">
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2 font-heading">
-              <Package className="h-4 w-4 text-blue-400" /> Reserved Equipment Items
+          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm p-5">
+            <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2 font-heading">
+              <Package className="h-4 w-4 text-blue-600" /> Reserved Equipment Items
             </h3>
-            <div className="divide-y divide-slate-800 border border-slate-800 rounded-lg bg-slate-950 overflow-hidden text-xs">
+            <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl bg-slate-50/50 overflow-hidden text-xs">
               {reservation.items?.map((item) => (
                 <div key={item.id} className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center overflow-hidden">
+                    <div className="h-10 w-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center overflow-hidden">
                       {item.equipment?.images?.[0]?.imageUrl ? (
                         <img
                           src={item.equipment.images[0].imageUrl}
@@ -322,16 +322,16 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <Package className="h-5 w-5 text-slate-600" />
+                        <Package className="h-5 w-5 text-slate-400" />
                       )}
                     </div>
                     <div>
-                      <p className="font-semibold text-white">{item.equipment?.name || "Equipment Item"}</p>
+                      <p className="font-semibold text-slate-900">{item.equipment?.name || "Equipment Item"}</p>
                       <p className="text-slate-500">Quantity: {item.quantity}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="font-semibold text-blue-400 block">{formatCurrency(item.subtotal)}</span>
+                    <span className="font-bold text-blue-600 block">{formatCurrency(item.subtotal)}</span>
                     <span className="text-[10px] text-slate-500">Dep: {formatCurrency(item.deposit)}</span>
                   </div>
                 </div>
@@ -340,13 +340,13 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
           </Card>
 
           {/* Workflow Action Bar */}
-          <Card className="border-slate-800 bg-slate-900/80 p-5">
-            <h3 className="text-sm font-semibold text-white mb-3">Management Workflow Actions</h3>
+          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm p-5">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Management Workflow Actions</h3>
             <div className="flex flex-wrap items-center gap-3">
               {reservation.status === "PENDING" && isStaffOrAdmin && (
                 <>
                   <Button
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white gap-2"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
                     onClick={() => approveMutation.mutate()}
                     isLoading={approveMutation.isPending}
                   >
@@ -364,7 +364,7 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
 
               {reservation.status === "APPROVED" && isStaffOrAdmin && (
                 <Button
-                  className="bg-blue-600 hover:bg-blue-500 text-white gap-2"
+                  className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
                   onClick={() => activateMutation.mutate()}
                   isLoading={activateMutation.isPending}
                 >
@@ -374,7 +374,7 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
 
               {reservation.status === "ACTIVE" && (isStaffOrAdmin || isWarehouse) && (
                 <Button
-                  className="bg-purple-600 hover:bg-purple-500 text-white gap-2"
+                  className="bg-purple-600 hover:bg-purple-700 text-white gap-2"
                   onClick={() => setReturning(true)}
                 >
                   <RotateCcw className="h-4 w-4" /> Complete Return Inspection
@@ -384,7 +384,7 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
               {(reservation.status === "PENDING" || reservation.status === "APPROVED") && (
                 <Button
                   variant="outline"
-                  className="border-slate-800 bg-slate-950 text-rose-400 hover:bg-rose-950/40 gap-2"
+                  className="border-slate-300 bg-white text-rose-600 hover:bg-rose-50 gap-2"
                   onClick={() => cancelMutation.mutate()}
                   isLoading={cancelMutation.isPending}
                 >
@@ -410,9 +410,9 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
             placeholder="e.g. Item unavailable during specified dates..."
-            className="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"
+            className="w-full rounded-xl border border-slate-300 bg-white p-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-xs"
           />
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
             <Button variant="ghost" onClick={() => setRejecting(false)}>
               Cancel
             </Button>
@@ -442,14 +442,14 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
             value={returnNotes}
             onChange={(e) => setReturnNotes(e.target.value)}
             placeholder="e.g. Equipment returned in full working condition."
-            className="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full rounded-xl border border-slate-300 bg-white p-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-xs"
           />
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
             <Button variant="ghost" onClick={() => setReturning(false)}>
               Cancel
             </Button>
             <Button
-              className="bg-purple-600 hover:bg-purple-500 text-white"
+              className="bg-purple-600 hover:bg-purple-700 text-white"
               onClick={() => returnMutation.mutate(returnNotes.trim())}
               isLoading={returnMutation.isPending}
             >
@@ -460,4 +460,5 @@ export default function ReservationDetailPage({ params }: { params: Promise<{ id
       </Modal>
     </div>
   );
+
 }

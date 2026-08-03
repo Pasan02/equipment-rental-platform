@@ -11,23 +11,23 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", isLoading = false, children, disabled, ...props }, ref) => {
     const baseStyles =
-      "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer active:scale-[0.98] transition-all duration-150";
+      "inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 disabled:pointer-events-none disabled:opacity-50 cursor-pointer active:scale-[0.98] duration-150";
 
     const variants = {
-      default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
-      secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-      outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-      destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
-      ghost: "hover:bg-accent hover:text-accent-foreground",
-      link: "text-primary underline-offset-4 hover:underline",
-      accent: "bg-amber-600 text-white hover:bg-amber-700 shadow-sm",
+      default: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-blue-600/20",
+      secondary: "bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-200",
+      outline: "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm",
+      destructive: "bg-rose-600 text-white hover:bg-rose-700 shadow-sm",
+      ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+      link: "text-blue-600 underline-offset-4 hover:underline",
+      accent: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm",
     };
 
     const sizes = {
-      default: "h-10 px-4 py-2",
-      sm: "h-8 rounded-md px-3 text-xs",
-      lg: "h-11 rounded-md px-8 text-base",
-      icon: "h-10 w-10 p-0",
+      default: "h-9 px-4 py-2 text-xs font-semibold",
+      sm: "h-8 rounded-lg px-3 text-xs",
+      lg: "h-11 rounded-xl px-6 text-sm font-semibold",
+      icon: "h-9 w-9 p-0",
     };
 
     return (
@@ -46,3 +46,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export { Button };
+
+
+

@@ -53,17 +53,17 @@ export function UserNav() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2.5 rounded-lg p-1.5 hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+        className="flex items-center gap-2.5 rounded-xl p-1.5 hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
         aria-label="User menu"
       >
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-sm">
           {initials}
         </div>
         <div className="hidden md:flex flex-col text-left">
-          <span className="text-xs font-semibold text-slate-200 leading-none">
+          <span className="text-xs font-semibold text-slate-900 leading-none">
             {user.firstName} {user.lastName}
           </span>
-          <span className="text-[10px] text-slate-400 leading-tight mt-0.5 truncate max-w-[120px]">
+          <span className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate max-w-[120px]">
             {user.email}
           </span>
         </div>
@@ -71,12 +71,12 @@ export function UserNav() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-800 bg-slate-900 shadow-2xl z-50 py-1 divide-y divide-slate-800 animate-fade-in">
-          <div className="px-4 py-3">
-            <p className="text-xs font-semibold text-white">
+        <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 bg-white shadow-xl z-50 py-1 divide-y divide-slate-100 animate-fade-in">
+          <div className="px-4 py-3 bg-slate-50/50">
+            <p className="text-xs font-bold text-slate-900">
               {user.firstName} {user.lastName}
             </p>
-            <p className="text-xs text-slate-400 truncate">{user.email}</p>
+            <p className="text-xs text-slate-500 truncate mt-0.5">{user.email}</p>
             <div className="mt-2">
               <Badge variant={getRoleBadgeVariant(user.role)} className="text-[10px] px-2 py-0">
                 {user.role}
@@ -88,7 +88,7 @@ export function UserNav() {
             <Link
               href="/settings"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors cursor-pointer"
             >
               <Settings className="h-4 w-4 text-slate-400" />
               Settings
@@ -98,7 +98,7 @@ export function UserNav() {
           <div className="py-1">
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-2.5 px-4 py-2 text-xs font-medium text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 transition-colors cursor-pointer"
+              className="flex w-full items-center gap-2.5 px-4 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
               Log Out
@@ -109,3 +109,4 @@ export function UserNav() {
     </div>
   );
 }
+

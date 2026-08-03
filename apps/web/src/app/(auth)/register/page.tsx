@@ -78,17 +78,17 @@ export default function RegisterPage() {
   };
 
   return (
-    <Card className="border-slate-800 bg-slate-900/90 backdrop-blur-xl text-slate-100 shadow-2xl">
+    <Card className="border-slate-200 bg-white text-slate-900 shadow-xl">
       <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-2xl font-bold font-heading text-white">Create an Account</CardTitle>
-        <CardDescription className="text-slate-400 text-sm">
+        <CardTitle className="text-2xl font-bold font-heading text-slate-900">Create an Account</CardTitle>
+        <CardDescription className="text-slate-500 text-sm">
           Register to browse and reserve professional equipment
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
         {errorMsg && (
-          <div className="flex items-center gap-2 rounded-lg bg-rose-500/10 border border-rose-500/20 p-3 text-xs text-rose-400 animate-fade-in">
+          <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700 animate-fade-in">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -97,71 +97,71 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">First Name</label>
+              <label className="text-xs font-semibold text-slate-700">First Name</label>
               <div className="relative">
-                <User className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                 <Input
                   {...register("firstName")}
                   placeholder="John"
-                  className="pl-9 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+                  className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
                   error={errors.firstName?.message}
                 />
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Last Name</label>
+              <label className="text-xs font-semibold text-slate-700">Last Name</label>
               <Input
                 {...register("lastName")}
                 placeholder="Doe"
-                className="bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
                 error={errors.lastName?.message}
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Email Address</label>
+            <label className="text-xs font-semibold text-slate-700">Email Address</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <Input
                 {...register("email")}
                 type="email"
                 placeholder="john@example.com"
-                className="pl-9 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+                className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
                 error={errors.email?.message}
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Phone Number</label>
+            <label className="text-xs font-semibold text-slate-700">Phone Number</label>
             <div className="relative">
-              <Phone className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+              <Phone className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <Input
                 {...register("phone")}
                 type="tel"
                 placeholder="+1 (555) 000-0000"
-                className="pl-9 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+                className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
                 error={errors.phone?.message}
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Password</label>
+            <label className="text-xs font-semibold text-slate-700">Password</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <Input
                 {...register("password")}
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                className="pl-9 pr-10 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+                className="pl-9 pr-10 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
                 error={errors.password?.message}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -170,14 +170,14 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Confirm Password</label>
+            <label className="text-xs font-semibold text-slate-700">Confirm Password</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <Input
                 {...register("confirmPassword")}
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                className="pl-9 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+                className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
                 error={errors.confirmPassword?.message}
               />
             </div>
@@ -185,7 +185,7 @@ export default function RegisterPage() {
 
           <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/25 mt-2"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm mt-2"
             isLoading={isLoading}
           >
             Create Account
@@ -193,12 +193,12 @@ export default function RegisterPage() {
         </form>
       </CardContent>
 
-      <CardFooter className="justify-center border-t border-slate-800/80 pt-4">
-        <p className="text-xs text-slate-400">
+      <CardFooter className="justify-center border-t border-slate-100 pt-4">
+        <p className="text-xs text-slate-500">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+            className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
           >
             Sign in
           </Link>

@@ -315,7 +315,7 @@ export default function ReservationsPage() {
       </div>
 
       {/* Status Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-800">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200">
         {STATUS_TABS.map((tab) => (
           <button
             key={tab}
@@ -323,10 +323,10 @@ export default function ReservationsPage() {
               setStatusTab(tab);
               setPage(1);
             }}
-            className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all capitalize cursor-pointer flex-shrink-0 ${
+            className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all capitalize cursor-pointer flex-shrink-0 ${
               statusTab === tab
-                ? "bg-blue-600 text-white shadow-md shadow-blue-600/25"
-                : "text-slate-400 hover:bg-slate-800/80 hover:text-slate-200"
+                ? "bg-blue-600 text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             }`}
           >
             {tab.toLowerCase()}
@@ -335,15 +335,15 @@ export default function ReservationsPage() {
       </div>
 
       {/* Search & Date Controls */}
-      <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100">
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
         <CardContent className="p-4 flex flex-col md:flex-row items-center gap-4">
           <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search reservation # or customer name..."
-              className="pl-9 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+              className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
             />
           </div>
 
@@ -355,9 +355,9 @@ export default function ReservationsPage() {
                 setFromDate(e.target.value);
                 setPage(1);
               }}
-              className="bg-slate-950 border-slate-800 text-xs text-white"
+              className="bg-white border-slate-300 text-xs text-slate-900"
             />
-            <span className="text-slate-500 text-xs">to</span>
+            <span className="text-slate-400 text-xs">to</span>
             <Input
               type="date"
               value={toDate}
@@ -365,17 +365,17 @@ export default function ReservationsPage() {
                 setToDate(e.target.value);
                 setPage(1);
               }}
-              className="bg-slate-950 border-slate-800 text-xs text-white"
+              className="bg-white border-slate-300 text-xs text-slate-900"
             />
           </div>
         </CardContent>
       </Card>
 
       {/* Reservations Table */}
-      <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100 shadow-xl overflow-hidden">
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-800 bg-slate-950/60 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600 uppercase tracking-wider">
               <tr>
                 <th className="py-3.5 px-4">Reservation #</th>
                 <th className="py-3.5 px-4">Customer</th>
@@ -386,7 +386,7 @@ export default function ReservationsPage() {
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500">
@@ -397,13 +397,13 @@ export default function ReservationsPage() {
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500">
                     <Calendar className="h-8 w-8 mx-auto mb-2 stroke-1" />
-                    <p className="font-medium text-slate-400">No reservations found matching filters.</p>
+                    <p className="font-medium text-slate-700">No reservations found matching filters.</p>
                   </td>
                 </tr>
               ) : (
                 items.map((res) => (
-                  <tr key={res.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-semibold text-white">
+                  <tr key={res.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-mono font-semibold text-blue-600">
                       {res.reservationNumber}
                       <span className="text-[10px] text-slate-500 block font-normal font-sans">
                         {formatDateTime(res.createdAt)}
@@ -412,9 +412,9 @@ export default function ReservationsPage() {
 
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-slate-500 flex-shrink-0" />
+                        <User className="h-4 w-4 text-slate-400 flex-shrink-0" />
                         <div>
-                          <p className="font-medium text-slate-200 text-xs">
+                          <p className="font-medium text-slate-900 text-xs">
                             {res.customer
                               ? `${res.customer.firstName} ${res.customer.lastName}`
                               : "N/A"}
@@ -426,10 +426,10 @@ export default function ReservationsPage() {
                       </div>
                     </td>
 
-                    <td className="py-3.5 px-4 text-xs text-slate-300">
+                    <td className="py-3.5 px-4 text-xs text-slate-600">
                       {res.items && res.items.length > 0 ? (
                         <div className="flex items-center gap-1.5">
-                          <Package className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+                          <Package className="h-3.5 w-3.5 text-blue-600 flex-shrink-0" />
                           <span className="truncate max-w-[180px]">
                             {res.items[0].equipment?.name || "Equipment Item"}
                             {res.items.length > 1 ? ` +${res.items.length - 1} more` : ""}
@@ -443,12 +443,12 @@ export default function ReservationsPage() {
                     </td>
 
                     <td className="py-3.5 px-4 text-xs">
-                      <div className="text-slate-200 font-medium">{formatDate(res.pickupDate)}</div>
-                      <div className="text-[10px] text-slate-400">to {formatDate(res.returnDate)}</div>
+                      <div className="text-slate-900 font-medium">{formatDate(res.pickupDate)}</div>
+                      <div className="text-[10px] text-slate-500">to {formatDate(res.returnDate)}</div>
                     </td>
 
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-blue-400">{formatCurrency(res.totalAmount)}</div>
+                      <div className="font-semibold text-slate-900">{formatCurrency(res.totalAmount)}</div>
                       <div className="text-[10px] text-slate-500 font-mono">
                         Dep: {formatCurrency(res.depositTotal)}
                       </div>
@@ -465,60 +465,12 @@ export default function ReservationsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-slate-400 hover:text-white"
+                          className="h-8 w-8 text-slate-500 hover:text-slate-900"
                           onClick={() => setSelectedReservation(res)}
                           title="View reservation detail"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
-
-                        {/* Workflow Action Buttons */}
-                        {res.status === "PENDING" && canApprove && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-emerald-400 hover:bg-emerald-950/40"
-                              onClick={() => approveMutation.mutate(res.id)}
-                              title="Approve reservation"
-                            >
-                              <CheckCircle className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-rose-400 hover:bg-rose-950/40"
-                              onClick={() => setRejectingId(res.id)}
-                              title="Reject reservation"
-                            >
-                              <XCircle className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
-
-                        {res.status === "APPROVED" && canApprove && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-blue-400 hover:bg-blue-950/40"
-                            onClick={() => activateMutation.mutate(res.id)}
-                            title="Activate pickup"
-                          >
-                            <Play className="h-4 w-4" />
-                          </Button>
-                        )}
-
-                        {res.status === "ACTIVE" && canReturn && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-purple-400 hover:bg-purple-950/40"
-                            onClick={() => setReturningId(res.id)}
-                            title="Mark equipment returned"
-                          >
-                            <RotateCcw className="h-4 w-4" />
-                          </Button>
-                        )}
                       </div>
                     </td>
                   </tr>
@@ -530,7 +482,7 @@ export default function ReservationsPage() {
 
         {/* Pagination Bar */}
         {meta && meta.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-800 bg-slate-950/40 text-xs text-slate-400">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 bg-slate-50 text-xs text-slate-600">
             <div>
               Page {meta.page} of {meta.totalPages} ({meta.total} reservations)
             </div>
@@ -540,7 +492,7 @@ export default function ReservationsPage() {
                 size="sm"
                 disabled={!meta.hasPrevPage}
                 onClick={() => setPage(page - 1)}
-                className="h-8 border-slate-800 bg-slate-900 text-slate-300"
+                className="h-8 border-slate-300 bg-white text-slate-600"
               >
                 <ChevronLeft className="h-3.5 w-3.5 mr-1" /> Previous
               </Button>
@@ -549,7 +501,7 @@ export default function ReservationsPage() {
                 size="sm"
                 disabled={!meta.hasNextPage}
                 onClick={() => setPage(page + 1)}
-                className="h-8 border-slate-800 bg-slate-900 text-slate-300"
+                className="h-8 border-slate-300 bg-white text-slate-600"
               >
                 Next <ChevronRight className="h-3.5 w-3.5 ml-1" />
               </Button>
@@ -569,16 +521,16 @@ export default function ReservationsPage() {
         {selectedReservation && (
           <div className="space-y-5 max-h-[75vh] overflow-y-auto pr-1 text-xs">
             {/* Status & Banner */}
-            <div className="flex items-center justify-between p-3.5 rounded-lg bg-slate-950 border border-slate-800">
+            <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
               <div>
-                <span className="text-slate-400 font-medium block">Current Status</span>
+                <span className="text-slate-500 font-medium block">Current Status</span>
                 <Badge variant={getStatusBadgeVariant(selectedReservation.status)} className="mt-1">
                   {selectedReservation.status}
                 </Badge>
               </div>
               <div className="text-right">
-                <span className="text-slate-400 font-medium block">Rental Duration</span>
-                <span className="text-white font-semibold">
+                <span className="text-slate-500 font-medium block">Rental Duration</span>
+                <span className="text-slate-900 font-semibold">
                   {formatDate(selectedReservation.pickupDate)} — {formatDate(selectedReservation.returnDate)}
                 </span>
               </div>
@@ -586,49 +538,49 @@ export default function ReservationsPage() {
 
             {/* Rejection Reason notice if REJECTED */}
             {selectedReservation.rejectionReason && (
-              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300">
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700">
                 <span className="font-semibold block mb-0.5">Rejection Reason:</span>
                 <p>{selectedReservation.rejectionReason}</p>
               </div>
             )}
 
             {/* Customer Details Grid */}
-            <div className="grid grid-cols-2 gap-3 p-3.5 rounded-lg bg-slate-950 border border-slate-800">
+            <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
               <div>
-                <span className="text-slate-400 block mb-0.5">Customer Profile</span>
-                <p className="font-semibold text-white">
+                <span className="text-slate-500 block mb-0.5">Customer Profile</span>
+                <p className="font-semibold text-slate-900">
                   {selectedReservation.customer?.firstName} {selectedReservation.customer?.lastName}
                 </p>
-                <p className="text-slate-400">{selectedReservation.customer?.email}</p>
-                <p className="text-slate-400">{selectedReservation.customer?.phone}</p>
+                <p className="text-slate-600">{selectedReservation.customer?.email}</p>
+                <p className="text-slate-600">{selectedReservation.customer?.phone}</p>
               </div>
 
               <div>
-                <span className="text-slate-400 block mb-0.5">Financial Summary</span>
-                <p className="text-slate-300">
-                  Rental Total: <span className="font-semibold text-white">{formatCurrency(selectedReservation.totalAmount)}</span>
+                <span className="text-slate-500 block mb-0.5">Financial Summary</span>
+                <p className="text-slate-700">
+                  Rental Total: <span className="font-semibold text-slate-900">{formatCurrency(selectedReservation.totalAmount)}</span>
                 </p>
-                <p className="text-slate-300">
-                  Security Deposit: <span className="font-semibold text-white">{formatCurrency(selectedReservation.depositTotal)}</span>
+                <p className="text-slate-700">
+                  Security Deposit: <span className="font-semibold text-slate-900">{formatCurrency(selectedReservation.depositTotal)}</span>
                 </p>
               </div>
             </div>
 
             {/* Reserved Items List */}
             <div>
-              <h4 className="font-semibold text-white mb-2">Reserved Items</h4>
-              <div className="divide-y divide-slate-800 rounded-lg border border-slate-800 bg-slate-950 overflow-hidden">
+              <h4 className="font-semibold text-slate-900 mb-2">Reserved Items</h4>
+              <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white overflow-hidden">
                 {selectedReservation.items?.map((item) => (
                   <div key={item.id} className="p-3 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <Package className="h-4 w-4 text-blue-400" />
+                      <Package className="h-4 w-4 text-blue-600" />
                       <div>
-                        <p className="font-medium text-white">{item.equipment?.name || "Equipment"}</p>
+                        <p className="font-medium text-slate-900">{item.equipment?.name || "Equipment"}</p>
                         <p className="text-[10px] text-slate-500">Qty: {item.quantity}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="font-semibold text-blue-400">{formatCurrency(item.subtotal)}</span>
+                      <span className="font-semibold text-blue-600">{formatCurrency(item.subtotal)}</span>
                       <span className="text-[10px] text-slate-500 block">Dep: {formatCurrency(item.deposit)}</span>
                     </div>
                   </div>
@@ -637,12 +589,12 @@ export default function ReservationsPage() {
             </div>
 
             {/* Actions Toolbar in Modal */}
-            <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
               {selectedReservation.status === "PENDING" && canApprove && (
                 <>
                   <Button
                     size="sm"
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white gap-1"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
                     onClick={() => approveMutation.mutate(selectedReservation.id)}
                   >
                     <CheckCircle className="h-3.5 w-3.5" /> Approve
@@ -661,7 +613,7 @@ export default function ReservationsPage() {
               {selectedReservation.status === "APPROVED" && canApprove && (
                 <Button
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-500 text-white gap-1"
+                  className="bg-blue-600 hover:bg-blue-700 text-white gap-1"
                   onClick={() => activateMutation.mutate(selectedReservation.id)}
                 >
                   <Play className="h-3.5 w-3.5" /> Activate Pickup
@@ -671,7 +623,7 @@ export default function ReservationsPage() {
               {selectedReservation.status === "ACTIVE" && canReturn && (
                 <Button
                   size="sm"
-                  className="bg-purple-600 hover:bg-purple-500 text-white gap-1"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white gap-1"
                   onClick={() => setReturningId(selectedReservation.id)}
                 >
                   <RotateCcw className="h-3.5 w-3.5" /> Complete Return
@@ -682,7 +634,7 @@ export default function ReservationsPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-slate-800 bg-slate-900 text-rose-400 hover:bg-rose-950/40 gap-1"
+                  className="border-slate-300 text-rose-600 hover:bg-rose-50 gap-1"
                   onClick={() => cancelMutation.mutate(selectedReservation.id)}
                 >
                   <Ban className="h-3.5 w-3.5" /> Cancel Reservation
@@ -707,10 +659,10 @@ export default function ReservationsPage() {
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
             placeholder="e.g. Equipment unavailable due to scheduled maintenance..."
-            className="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"
+            className="w-full rounded-xl border border-slate-300 bg-white p-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-xs"
             required
           />
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
             <Button variant="ghost" onClick={() => setRejectingId(null)}>
               Cancel
             </Button>
@@ -743,14 +695,14 @@ export default function ReservationsPage() {
             value={returnNotes}
             onChange={(e) => setReturnNotes(e.target.value)}
             placeholder="e.g. Returned in good condition, battery fully charged."
-            className="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full rounded-xl border border-slate-300 bg-white p-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
           />
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
             <Button variant="ghost" onClick={() => setReturningId(null)}>
               Cancel
             </Button>
             <Button
-              className="bg-purple-600 hover:bg-purple-500 text-white"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
               onClick={() =>
                 returningId &&
                 returnMutation.mutate({ id: returningId, notes: returnNotes.trim() })
@@ -772,7 +724,7 @@ export default function ReservationsPage() {
         maxWidth="md"
       >
         {createError && (
-          <div className="flex items-center gap-2 rounded-lg bg-rose-500/10 border border-rose-500/20 p-3 text-xs text-rose-400 mb-4">
+          <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700 mb-4">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>{createError}</span>
           </div>
@@ -780,11 +732,11 @@ export default function ReservationsPage() {
 
         <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs">
           <div className="space-y-1.5">
-            <label className="font-semibold text-slate-300">Select Equipment *</label>
+            <label className="font-semibold text-slate-700">Select Equipment *</label>
             <select
               value={createFormData.equipmentId}
               onChange={(e) => setCreateFormData({ ...createFormData, equipmentId: e.target.value })}
-              className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-xs"
               required
             >
               <option value="">Choose Equipment Item...</option>
@@ -798,57 +750,57 @@ export default function ReservationsPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="font-semibold text-slate-300">Pickup Date *</label>
+              <label className="font-semibold text-slate-700">Pickup Date *</label>
               <Input
                 type="date"
                 value={createFormData.pickupDate}
                 onChange={(e) => setCreateFormData({ ...createFormData, pickupDate: e.target.value })}
-                className="bg-slate-950 border-slate-800 text-white"
+                className="bg-white border-slate-300 text-slate-900"
                 required
               />
             </div>
             <div className="space-y-1.5">
-              <label className="font-semibold text-slate-300">Return Date *</label>
+              <label className="font-semibold text-slate-700">Return Date *</label>
               <Input
                 type="date"
                 value={createFormData.returnDate}
                 onChange={(e) => setCreateFormData({ ...createFormData, returnDate: e.target.value })}
-                className="bg-slate-950 border-slate-800 text-white"
+                className="bg-white border-slate-300 text-slate-900"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="font-semibold text-slate-300">Quantity *</label>
+            <label className="font-semibold text-slate-700">Quantity *</label>
             <Input
               type="number"
               min="1"
               value={createFormData.quantity}
               onChange={(e) => setCreateFormData({ ...createFormData, quantity: e.target.value })}
-              className="bg-slate-950 border-slate-800 text-white"
+              className="bg-white border-slate-300 text-slate-900"
               required
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="font-semibold text-slate-300">Reservation Notes</label>
+            <label className="font-semibold text-slate-700">Reservation Notes</label>
             <textarea
               rows={2}
               value={createFormData.notes}
               onChange={(e) => setCreateFormData({ ...createFormData, notes: e.target.value })}
               placeholder="Special instructions or project requirements..."
-              className="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-300 bg-white p-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
             <Button type="button" variant="ghost" onClick={() => setIsCreateModalOpen(false)}>
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-500 text-white"
+              variant="default"
               isLoading={createMutation.isPending}
             >
               Submit Reservation

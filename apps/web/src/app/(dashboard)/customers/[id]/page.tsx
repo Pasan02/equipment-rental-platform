@@ -136,7 +136,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <Link href="/customers">
-          <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white gap-2 cursor-pointer">
+          <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900 gap-2 cursor-pointer">
             <ArrowLeft className="h-4 w-4" /> Back to Directory
           </Button>
         </Link>
@@ -154,15 +154,15 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Profile Overview Card */}
-      <Card className="border-slate-800 bg-slate-900/80 p-6">
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-blue-600 font-bold text-white text-xl flex items-center justify-center shadow-lg shadow-blue-600/25 flex-shrink-0">
+            <div className="h-16 w-16 rounded-2xl bg-blue-600 font-bold text-white text-xl flex items-center justify-center shadow-md flex-shrink-0">
               {initials}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold font-heading text-white">
+                <h1 className="text-2xl font-extrabold font-heading text-slate-900">
                   {customer.firstName} {customer.lastName}
                 </h1>
                 <Badge variant={getRoleBadgeVariant(customer.role)} className="text-xs">
@@ -172,17 +172,17 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                   {customer.isActive ? "Active" : "Inactive"}
                 </Badge>
               </div>
-              <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-slate-400">
+              <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-slate-500">
                 <div className="flex items-center gap-1.5">
-                  <Mail className="h-3.5 w-3.5 text-slate-500" />
+                  <Mail className="h-3.5 w-3.5 text-slate-400" />
                   <span>{customer.email}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Phone className="h-3.5 w-3.5 text-slate-500" />
+                  <Phone className="h-3.5 w-3.5 text-slate-400" />
                   <span>{customer.phone || "No phone provided"}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5 text-slate-500" />
+                  <Calendar className="h-3.5 w-3.5 text-slate-400" />
                   <span>Joined {formatDate(customer.createdAt)}</span>
                 </div>
               </div>
@@ -195,20 +195,20 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Reservation History (2 cols) */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border-slate-800 bg-slate-900/80 p-5">
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2 font-heading">
-              <Calendar className="h-4 w-4 text-blue-400" /> Reservation History
+          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm p-5">
+            <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2 font-heading">
+              <Calendar className="h-4 w-4 text-blue-600" /> Reservation History
             </h3>
             {!customer.customerReservations || customer.customerReservations.length === 0 ? (
-              <p className="text-xs text-slate-500 py-6 text-center">No reservations made by this customer yet.</p>
+              <p className="text-xs text-slate-400 py-6 text-center">No reservations made by this customer yet.</p>
             ) : (
-              <div className="divide-y divide-slate-800 border border-slate-800 rounded-lg bg-slate-950 overflow-hidden text-xs">
+              <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl bg-slate-50/50 overflow-hidden text-xs">
                 {customer.customerReservations.map((res) => (
-                  <div key={res.id} className="p-3.5 flex items-center justify-between hover:bg-slate-900/50 transition-colors">
+                  <div key={res.id} className="p-3.5 flex items-center justify-between hover:bg-slate-100/50 transition-colors">
                     <div>
                       <Link
                         href={`/reservations/${res.id}`}
-                        className="font-mono font-semibold text-white hover:text-blue-400 transition-colors"
+                        className="font-mono font-semibold text-slate-900 hover:text-blue-600 transition-colors"
                       >
                         {res.reservationNumber}
                       </Link>
@@ -217,10 +217,10 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge variant={getStatusBadgeVariant(res.status)} className="text-[10px]">
+                      <Badge variant={getStatusBadgeVariant(res.status)} className="text-xs">
                         {res.status}
                       </Badge>
-                      <span className="font-semibold text-blue-400 font-mono">
+                      <span className="font-bold text-blue-600 font-mono">
                         {formatCurrency(res.totalAmount)}
                       </span>
                     </div>
@@ -233,28 +233,28 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
 
         {/* Uploaded Documents (1 col) */}
         <div className="space-y-6">
-          <Card className="border-slate-800 bg-slate-900/80 p-5">
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2 font-heading">
-              <FileText className="h-4 w-4 text-purple-400" /> Verification Documents
+          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm p-5">
+            <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2 font-heading">
+              <FileText className="h-4 w-4 text-purple-600" /> Verification Documents
             </h3>
             {!customer.uploads || customer.uploads.length === 0 ? (
-              <p className="text-xs text-slate-500 py-6 text-center">No identity/agreement documents uploaded.</p>
+              <p className="text-xs text-slate-400 py-6 text-center">No identity/agreement documents uploaded.</p>
             ) : (
               <div className="space-y-2.5">
                 {customer.uploads.map((doc) => (
                   <div
                     key={doc.id}
-                    className="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between text-xs"
+                    className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs"
                   >
                     <div className="truncate">
-                      <p className="font-semibold text-white truncate">{doc.fileName}</p>
+                      <p className="font-semibold text-slate-900 truncate">{doc.fileName}</p>
                       <p className="text-[10px] text-slate-500">{doc.type}</p>
                     </div>
                     <a
                       href={doc.fileUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-blue-400 hover:text-blue-300 p-1.5 cursor-pointer"
+                      className="text-blue-600 hover:text-blue-700 p-1.5 cursor-pointer"
                       title="Download document"
                     >
                       <ExternalLink className="h-4 w-4" />
@@ -268,4 +268,5 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       </div>
     </div>
   );
+
 }

@@ -197,27 +197,27 @@ export default function PaymentsPage() {
       </div>
 
       {/* Filters Bar */}
-      <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100">
-        <CardContent className="p-4 flex flex-col md:flex-row items-center gap-4">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
+        <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by transaction ID or reservation #..."
-              className="pl-9 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+              className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
             />
           </div>
 
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <Filter className="h-4 w-4 text-slate-500 flex-shrink-0 hidden sm:block" />
+            <Filter className="h-4 w-4 text-slate-400 flex-shrink-0 hidden sm:block" />
             <select
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="h-10 w-full md:w-36 rounded-lg border border-slate-800 bg-slate-950 px-3 text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              className="h-10 w-full md:w-36 rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-xs"
             >
               <option value="">All Statuses</option>
               <option value="PAID">PAID</option>
@@ -232,7 +232,7 @@ export default function PaymentsPage() {
                 setTypeFilter(e.target.value);
                 setPage(1);
               }}
-              className="h-10 w-full md:w-36 rounded-lg border border-slate-800 bg-slate-950 px-3 text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              className="h-10 w-full md:w-36 rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-xs"
             >
               <option value="">All Types</option>
               <option value="RENTAL">RENTAL</option>
@@ -245,10 +245,10 @@ export default function PaymentsPage() {
       </Card>
 
       {/* Payments Table */}
-      <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100 shadow-xl overflow-hidden">
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-800 bg-slate-950/60 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600 uppercase tracking-wider">
               <tr>
                 <th className="py-3.5 px-4">Transaction ID</th>
                 <th className="py-3.5 px-4">Reservation #</th>
@@ -259,57 +259,65 @@ export default function PaymentsPage() {
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100">
               {isLoading ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" /> Loading payments...
-                  </td>
-                </tr>
+                Array.from({ length: 5 }).map((_, index) => (
+                  <tr key={index} className="animate-pulse">
+                    <td className="py-4 px-4"><div className="h-4 w-32 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-28 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-20 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-6 w-16 bg-slate-200 rounded-full" /></td>
+                    <td className="py-4 px-4"><div className="h-6 w-16 bg-slate-200 rounded-full" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-24 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-8 w-16 bg-slate-200 rounded ml-auto" /></td>
+                  </tr>
+                ))
               ) : items.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500">
-                    <CreditCard className="h-8 w-8 mx-auto mb-2 stroke-1" />
-                    <p className="font-medium text-slate-400">No payment records found.</p>
+                    <div className="flex flex-col items-center justify-center">
+                      <CreditCard className="h-10 w-10 text-slate-300 mb-2 stroke-1" />
+                      <p className="text-sm font-semibold text-slate-700">No payment records found</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
                 items.map((payment) => (
-                  <tr key={payment.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-semibold text-white">
+                  <tr key={payment.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-4 px-4 font-mono font-semibold text-slate-900">
                       {payment.transactionId}
                     </td>
 
-                    <td className="py-3.5 px-4 font-mono text-xs text-blue-400">
+                    <td className="py-4 px-4 font-mono text-xs text-blue-600 font-medium">
                       {payment.reservation?.reservationNumber || "N/A"}
                     </td>
 
-                    <td className="py-3.5 px-4 font-bold text-white font-mono">
+                    <td className="py-4 px-4 font-bold text-slate-900">
                       {formatCurrency(payment.amount)}
                     </td>
 
-                    <td className="py-3.5 px-4">
-                      <Badge variant={getTypeBadgeVariant(payment.type)} className="text-[10px] px-2 py-0.5">
+                    <td className="py-4 px-4">
+                      <Badge variant={getTypeBadgeVariant(payment.type)} className="text-xs">
                         {payment.type}
                       </Badge>
                     </td>
 
-                    <td className="py-3.5 px-4">
-                      <Badge variant={getStatusBadgeVariant(payment.status)} className="text-[10px] px-2 py-0.5">
+                    <td className="py-4 px-4">
+                      <Badge variant={getStatusBadgeVariant(payment.status)} className="text-xs">
                         {payment.status}
                       </Badge>
                     </td>
 
-                    <td className="py-3.5 px-4 text-xs text-slate-400">
+                    <td className="py-4 px-4 text-xs text-slate-500">
                       {formatDateTime(payment.paidAt || payment.createdAt)}
                     </td>
 
-                    <td className="py-3.5 px-4 text-right">
+                    <td className="py-4 px-4 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-slate-400 hover:text-white"
+                          className="h-8 w-8 text-slate-500 hover:text-slate-900"
                           onClick={() => setSelectedPayment(payment)}
                           title="View Payment Details"
                         >
@@ -320,9 +328,9 @@ export default function PaymentsPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-emerald-400 hover:bg-emerald-950/40"
+                            className="h-8 w-8 text-emerald-600 hover:bg-emerald-50"
                             onClick={() => processMutation.mutate(payment.id)}
-                            title="Process Mock Payment"
+                            title="Process Payment"
                           >
                             <CheckCircle className="h-4 w-4" />
                           </Button>
@@ -332,7 +340,7 @@ export default function PaymentsPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-rose-400 hover:bg-rose-950/40"
+                            className="h-8 w-8 text-rose-600 hover:bg-rose-50"
                             onClick={() => {
                               setRefundingId(payment.id);
                               setRefundAmount(String(payment.amount));
@@ -352,30 +360,28 @@ export default function PaymentsPage() {
           </table>
         </div>
 
-        {/* Pagination Bar */}
+        {/* Pagination Footer */}
         {meta && meta.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-800 bg-slate-950/40 text-xs text-slate-400">
-            <div>
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 bg-slate-50 text-xs text-slate-600">
+            <span>
               Page {meta.page} of {meta.totalPages} ({meta.total} transactions)
-            </div>
+            </span>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 disabled={!meta.hasPrevPage}
                 onClick={() => setPage(page - 1)}
-                className="h-8 border-slate-800 bg-slate-900 text-slate-300"
               >
-                <ChevronLeft className="h-3.5 w-3.5 mr-1" /> Previous
+                Previous
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 disabled={!meta.hasNextPage}
                 onClick={() => setPage(page + 1)}
-                className="h-8 border-slate-800 bg-slate-900 text-slate-300"
               >
-                Next <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                Next
               </Button>
             </div>
           </div>
@@ -392,39 +398,39 @@ export default function PaymentsPage() {
       >
         {selectedPayment && (
           <div className="space-y-4 text-xs">
-            <div className="flex items-center justify-between p-3.5 rounded-lg bg-slate-950 border border-slate-800">
+            <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
               <div>
-                <span className="text-slate-400 block mb-1">Transaction Status</span>
+                <span className="text-slate-500 block mb-1">Transaction Status</span>
                 <Badge variant={getStatusBadgeVariant(selectedPayment.status)}>
                   {selectedPayment.status}
                 </Badge>
               </div>
               <div className="text-right">
-                <span className="text-slate-400 block mb-1">Payment Amount</span>
-                <span className="text-lg font-bold text-blue-400 font-mono">
+                <span className="text-slate-500 block mb-1">Payment Amount</span>
+                <span className="text-lg font-bold text-slate-900">
                   {formatCurrency(selectedPayment.amount)}
                 </span>
               </div>
             </div>
 
-            <div className="space-y-2 p-3.5 rounded-lg bg-slate-950 border border-slate-800">
-              <div className="flex justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">Payment Type</span>
+            <div className="space-y-2 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <div className="flex justify-between py-1 border-b border-slate-100">
+                <span className="text-slate-500">Payment Type</span>
                 <Badge variant={getTypeBadgeVariant(selectedPayment.type)}>
                   {selectedPayment.type}
                 </Badge>
               </div>
 
-              <div className="flex justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">Reservation #</span>
-                <span className="font-mono text-white font-semibold">
+              <div className="flex justify-between py-1 border-b border-slate-100">
+                <span className="text-slate-500">Reservation #</span>
+                <span className="font-mono text-slate-900 font-semibold">
                   {selectedPayment.reservation?.reservationNumber || "N/A"}
                 </span>
               </div>
 
-              <div className="flex justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">Customer</span>
-                <span className="text-white">
+              <div className="flex justify-between py-1 border-b border-slate-100">
+                <span className="text-slate-500">Customer</span>
+                <span className="text-slate-900 font-medium">
                   {selectedPayment.reservation?.customer
                     ? `${selectedPayment.reservation.customer.firstName} ${selectedPayment.reservation.customer.lastName}`
                     : "N/A"}
@@ -432,18 +438,18 @@ export default function PaymentsPage() {
               </div>
 
               <div className="flex justify-between pt-1">
-                <span className="text-slate-400">Transaction Date</span>
-                <span className="text-slate-300">
+                <span className="text-slate-500">Transaction Date</span>
+                <span className="text-slate-700">
                   {formatDateTime(selectedPayment.paidAt || selectedPayment.createdAt)}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
               {isAdmin && selectedPayment.status === "PENDING" && (
                 <Button
                   size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   onClick={() => processMutation.mutate(selectedPayment.id)}
                   isLoading={processMutation.isPending}
                 >
@@ -478,7 +484,7 @@ export default function PaymentsPage() {
         maxWidth="md"
       >
         {refundError && (
-          <div className="flex items-center gap-2 rounded-lg bg-rose-500/10 border border-rose-500/20 p-3 text-xs text-rose-400 mb-4">
+          <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700 mb-4">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>{refundError}</span>
           </div>
@@ -486,30 +492,30 @@ export default function PaymentsPage() {
 
         <form onSubmit={handleRefundSubmit} className="space-y-4 text-xs">
           <div className="space-y-1.5">
-            <label className="font-semibold text-slate-300">Refund Amount ($)</label>
+            <label className="font-semibold text-slate-700">Refund Amount ($)</label>
             <Input
               type="number"
               step="0.01"
               min="0.01"
               value={refundAmount}
               onChange={(e) => setRefundAmount(e.target.value)}
-              className="bg-slate-950 border-slate-800 text-white"
+              className="bg-white border-slate-300 text-slate-900"
               required
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="font-semibold text-slate-300">Refund Reason</label>
+            <label className="font-semibold text-slate-700">Refund Reason</label>
             <textarea
               rows={3}
               value={refundReason}
               onChange={(e) => setRefundReason(e.target.value)}
               placeholder="e.g. Customer returned equipment early / deposit return..."
-              className="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"
+              className="w-full rounded-xl border border-slate-300 bg-white p-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-xs"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
             <Button type="button" variant="ghost" onClick={() => setRefundingId(null)}>
               Cancel
             </Button>
@@ -523,6 +529,7 @@ export default function PaymentsPage() {
           </div>
         </form>
       </Modal>
+
     </div>
   );
 }

@@ -156,34 +156,34 @@ export default function CustomersPage() {
           <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
             Customer Directory
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Manage user accounts, roles, access permissions, and activity metrics.
           </p>
         </div>
       </div>
 
-      {/* Filter & Search Bar */}
-      <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100">
-        <CardContent className="p-4 flex flex-col md:flex-row items-center gap-4">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+      {/* Search & Filters */}
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
+        <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search customers by name or email address..."
-              className="pl-9 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+              placeholder="Search user name or email..."
+              className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
             />
           </div>
 
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <Filter className="h-4 w-4 text-slate-500 flex-shrink-0 hidden sm:block" />
+            <Filter className="h-4 w-4 text-slate-400 flex-shrink-0 hidden sm:block" />
             <select
               value={roleFilter}
               onChange={(e) => {
                 setRoleFilter(e.target.value);
                 setPage(1);
               }}
-              className="h-10 w-full md:w-40 rounded-lg border border-slate-800 bg-slate-950 px-3 text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              className="h-10 w-full md:w-40 rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-xs"
             >
               <option value="">All Roles</option>
               <option value="CUSTOMER">Customer</option>
@@ -195,7 +195,7 @@ export default function CustomersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="h-10 w-full md:w-36 rounded-lg border border-slate-800 bg-slate-950 px-3 text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              className="h-10 w-full md:w-36 rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-xs"
             >
               <option value="all">All Status</option>
               <option value="active">Active Only</option>
@@ -206,10 +206,10 @@ export default function CustomersPage() {
       </Card>
 
       {/* Users Data Table */}
-      <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100 shadow-xl overflow-hidden">
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-800 bg-slate-950/60 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600 uppercase tracking-wider">
               <tr>
                 <th className="py-3.5 px-4">User Profile</th>
                 <th className="py-3.5 px-4">Contact Info</th>
@@ -220,18 +220,26 @@ export default function CustomersPage() {
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100">
               {isLoading ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" /> Loading customers...
-                  </td>
-                </tr>
+                Array.from({ length: 5 }).map((_, index) => (
+                  <tr key={index} className="animate-pulse">
+                    <td className="py-4 px-4"><div className="h-4 w-32 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-40 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-6 w-16 bg-slate-200 rounded-full" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-16 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-24 bg-slate-200 rounded" /></td>
+                    <td className="py-4 px-4"><div className="h-6 w-16 bg-slate-200 rounded-full" /></td>
+                    <td className="py-4 px-4"><div className="h-8 w-16 bg-slate-200 rounded ml-auto" /></td>
+                  </tr>
+                ))
               ) : items.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500">
-                    <Users className="h-8 w-8 mx-auto mb-2 stroke-1" />
-                    <p className="font-medium text-slate-400">No users found matching search criteria.</p>
+                    <div className="flex flex-col items-center justify-center">
+                      <Users className="h-10 w-10 text-slate-300 mb-2 stroke-1" />
+                      <p className="text-sm font-semibold text-slate-700">No users found</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -241,8 +249,8 @@ export default function CustomersPage() {
                   }`.toUpperCase() || "U";
 
                   return (
-                    <tr key={userItem.id} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="py-3.5 px-4">
+                    <tr key={userItem.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
                           <div className="h-9 w-9 rounded-full bg-blue-600 text-xs font-bold text-white flex items-center justify-center shadow-sm flex-shrink-0">
                             {initials}
@@ -250,46 +258,43 @@ export default function CustomersPage() {
                           <div>
                             <Link
                               href={`/customers/${userItem.id}`}
-                              className="font-semibold text-white hover:text-blue-400 transition-colors block cursor-pointer"
+                              className="font-semibold text-slate-900 hover:text-blue-600 transition-colors"
                             >
                               {userItem.firstName} {userItem.lastName}
                             </Link>
-                            <span className="text-[10px] text-slate-500 block font-mono">
-                              ID: {userItem.id.slice(0, 8)}...
-                            </span>
                           </div>
                         </div>
                       </td>
 
-                      <td className="py-3.5 px-4 text-xs">
-                        <div className="flex items-center gap-1.5 text-slate-200">
-                          <Mail className="h-3.5 w-3.5 text-slate-500" />
+                      <td className="py-4 px-4 text-xs">
+                        <div className="flex items-center gap-1.5 text-slate-900">
+                          <Mail className="h-3.5 w-3.5 text-slate-400" />
                           <span>{userItem.email}</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-slate-500 mt-0.5">
-                          <Phone className="h-3.5 w-3.5 text-slate-500" />
+                          <Phone className="h-3.5 w-3.5 text-slate-400" />
                           <span>{userItem.phone || "No phone"}</span>
                         </div>
                       </td>
 
-                      <td className="py-3.5 px-4">
-                        <Badge variant={getRoleBadgeVariant(userItem.role)} className="text-[10px] px-2 py-0.5">
+                      <td className="py-4 px-4">
+                        <Badge variant={getRoleBadgeVariant(userItem.role)} className="text-xs">
                           {userItem.role}
                         </Badge>
                       </td>
 
-                      <td className="py-3.5 px-4 font-semibold text-blue-400 text-xs">
+                      <td className="py-4 px-4 font-semibold text-blue-600 text-xs">
                         {userItem._count?.customerReservations || 0} rentals
                       </td>
 
-                      <td className="py-3.5 px-4 text-xs text-slate-400">
+                      <td className="py-4 px-4 text-xs text-slate-500">
                         {formatDate(userItem.createdAt)}
                       </td>
 
-                      <td className="py-3.5 px-4">
+                      <td className="py-4 px-4">
                         <Badge
                           variant={userItem.isActive ? "success" : "secondary"}
-                          className="text-[10px] px-2 py-0.5 cursor-pointer"
+                          className="text-xs cursor-pointer"
                           onClick={() => isAdmin && toggleActiveMutation.mutate(userItem)}
                           title={isAdmin ? "Click to toggle account status" : undefined}
                         >
@@ -297,13 +302,13 @@ export default function CustomersPage() {
                         </Badge>
                       </td>
 
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-4 px-4 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <Link href={`/customers/${userItem.id}`}>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-slate-400 hover:text-white"
+                              className="h-8 w-8 text-slate-500 hover:text-slate-900"
                               title="View Customer Details"
                             >
                               <Eye className="h-4 w-4" />
@@ -314,7 +319,7 @@ export default function CustomersPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-slate-400 hover:text-blue-400"
+                              className="h-8 w-8 text-slate-500 hover:text-blue-600"
                               onClick={() => {
                                 setEditingUser(userItem);
                                 setEditRole(userItem.role);
@@ -334,30 +339,28 @@ export default function CustomersPage() {
           </table>
         </div>
 
-        {/* Pagination Bar */}
+        {/* Pagination Footer */}
         {meta && meta.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-800 bg-slate-950/40 text-xs text-slate-400">
-            <div>
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 bg-slate-50 text-xs text-slate-600">
+            <span>
               Page {meta.page} of {meta.totalPages} ({meta.total} users)
-            </div>
+            </span>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 disabled={!meta.hasPrevPage}
                 onClick={() => setPage(page - 1)}
-                className="h-8 border-slate-800 bg-slate-900 text-slate-300"
               >
-                <ChevronLeft className="h-3.5 w-3.5 mr-1" /> Previous
+                Previous
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 disabled={!meta.hasNextPage}
                 onClick={() => setPage(page + 1)}
-                className="h-8 border-slate-800 bg-slate-900 text-slate-300"
               >
-                Next <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                Next
               </Button>
             </div>
           </div>
@@ -374,11 +377,11 @@ export default function CustomersPage() {
       >
         <div className="space-y-4 text-xs">
           <div className="space-y-1.5">
-            <label className="font-semibold text-slate-300">System Access Role</label>
+            <label className="font-semibold text-slate-700">System Access Role</label>
             <select
               value={editRole}
               onChange={(e) => setEditRole(e.target.value)}
-              className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-xs"
             >
               <option value="CUSTOMER">CUSTOMER (Standard User)</option>
               <option value="STAFF">STAFF (Reservation Manager)</option>
@@ -387,12 +390,12 @@ export default function CustomersPage() {
             </select>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
             <Button variant="ghost" onClick={() => setEditingUser(null)}>
               Cancel
             </Button>
             <Button
-              className="bg-blue-600 hover:bg-blue-500 text-white"
+              variant="default"
               onClick={() =>
                 editingUser &&
                 updateRoleMutation.mutate({ id: editingUser.id, role: editRole })

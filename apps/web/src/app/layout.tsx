@@ -14,8 +14,8 @@ const fontHeading = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "EquipRent — Equipment Rental Management Platform",
-  description: "Manage professional equipment rentals, reservations, inventory, and payments with ease.",
+  title: "EquipRent — Professional Equipment Rental Platform",
+  description: "Enterprise equipment rental platform with real-time inventory tracking, reservation workflows, and financial analytics.",
 };
 
 export default function RootLayout({
@@ -25,9 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${fontSans.variable} ${fontHeading.variable}`}>
-      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+      <body className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900">
         <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
 }
+
+
+

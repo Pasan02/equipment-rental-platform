@@ -131,10 +131,10 @@ export default function DashboardPage() {
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading tracking-tight text-white">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading tracking-tight text-slate-900">
             Dashboard Overview
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Real-time analytics, equipment performance, and reservation management.
           </p>
         </div>
@@ -143,7 +143,7 @@ export default function DashboardPage() {
             variant="outline"
             size="sm"
             onClick={() => refetchStats()}
-            className="border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white gap-2"
+            className="border-slate-300 bg-white text-slate-700 hover:bg-slate-50 gap-2"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </Button>
@@ -153,31 +153,31 @@ export default function DashboardPage() {
       {/* 4-Column Stat Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Card 1: Total Revenue */}
-        <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100 shadow-lg hover:border-slate-700 transition-colors">
+        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm hover:border-slate-300 transition-colors">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Total Revenue
               </span>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                 <DollarSign className="h-5 w-5" />
               </div>
             </div>
             <div className="mt-4">
-              <div className="text-2xl font-bold text-white font-heading">
+              <div className="text-2xl font-bold text-slate-900 font-heading">
                 {isLoadingStats ? (
-                  <Loader2 className="h-6 w-6 animate-spin text-slate-500" />
+                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
                 ) : (
                   formatCurrency(stats?.totalRevenue || 0)
                 )}
               </div>
               <div className="mt-2 flex items-center gap-2 text-xs">
                 {stats && stats.revenueGrowth >= 0 ? (
-                  <span className="flex items-center font-medium text-emerald-400">
+                  <span className="flex items-center font-medium text-emerald-700">
                     <TrendingUp className="mr-1 h-3.5 w-3.5" /> +{stats.revenueGrowth.toFixed(1)}%
                   </span>
                 ) : (
-                  <span className="flex items-center font-medium text-rose-400">
+                  <span className="flex items-center font-medium text-rose-700">
                     <TrendingDown className="mr-1 h-3.5 w-3.5" /> {stats?.revenueGrowth.toFixed(1)}%
                   </span>
                 )}
@@ -188,26 +188,26 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 2: Active Reservations */}
-        <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100 shadow-lg hover:border-slate-700 transition-colors">
+        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm hover:border-slate-300 transition-colors">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Active Rentals
               </span>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
                 <Calendar className="h-5 w-5" />
               </div>
             </div>
             <div className="mt-4">
-              <div className="text-2xl font-bold text-white font-heading">
+              <div className="text-2xl font-bold text-slate-900 font-heading">
                 {isLoadingStats ? (
-                  <Loader2 className="h-6 w-6 animate-spin text-slate-500" />
+                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
                 ) : (
                   stats?.activeReservations || 0
                 )}
               </div>
               <div className="mt-2 flex items-center gap-2 text-xs">
-                <Badge variant="warning" className="text-[10px] px-2 py-0">
+                <Badge variant="warning" className="text-xs">
                   {stats?.pendingReservations || 0} Pending Approval
                 </Badge>
               </div>
@@ -216,20 +216,20 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 3: Total Customers */}
-        <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100 shadow-lg hover:border-slate-700 transition-colors">
+        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm hover:border-slate-300 transition-colors">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Total Customers
               </span>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
                 <Users className="h-5 w-5" />
               </div>
             </div>
             <div className="mt-4">
-              <div className="text-2xl font-bold text-white font-heading">
+              <div className="text-2xl font-bold text-slate-900 font-heading">
                 {isLoadingStats ? (
-                  <Loader2 className="h-6 w-6 animate-spin text-slate-500" />
+                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
                 ) : (
                   stats?.totalCustomers || 0
                 )}
@@ -240,25 +240,25 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 4: Equipment Utilization */}
-        <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100 shadow-lg hover:border-slate-700 transition-colors">
+        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm hover:border-slate-300 transition-colors">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Stock Utilization
               </span>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
                 <Percent className="h-5 w-5" />
               </div>
             </div>
             <div className="mt-4">
-              <div className="text-2xl font-bold text-white font-heading">
+              <div className="text-2xl font-bold text-slate-900 font-heading">
                 {isLoadingStats ? (
-                  <Loader2 className="h-6 w-6 animate-spin text-slate-500" />
+                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
                 ) : (
                   `${(stats?.equipmentUtilization || 0).toFixed(1)}%`
                 )}
               </div>
-              <div className="mt-2 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+              <div className="mt-2 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                 <div
                   className="bg-amber-500 h-full rounded-full transition-all duration-500"
                   style={{ width: `${Math.min(stats?.equipmentUtilization || 0, 100)}%` }}
@@ -272,25 +272,25 @@ export default function DashboardPage() {
       {/* Analytics Grid Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Reservation Trends Chart (2 cols) */}
-        <Card className="lg:col-span-2 border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100 shadow-lg">
+        <Card className="lg:col-span-2 border-slate-200 bg-white text-slate-900 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-lg font-semibold text-white font-heading">
+              <CardTitle className="text-lg font-bold text-slate-900 font-heading">
                 Reservation Volume Trends
               </CardTitle>
-              <CardDescription className="text-slate-400 text-xs mt-0.5">
+              <CardDescription className="text-slate-500 text-xs mt-0.5">
                 Time-series distribution of rental reservations by status
               </CardDescription>
             </div>
-            <div className="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800">
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
               {(["daily", "weekly", "monthly"] as const).map((period) => (
                 <button
                   key={period}
                   onClick={() => setTrendPeriod(period)}
-                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors capitalize cursor-pointer ${
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors capitalize cursor-pointer ${
                     trendPeriod === period
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "text-slate-400 hover:text-white"
+                      ? "bg-white text-slate-900 shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   {period}
@@ -300,11 +300,11 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="pt-4">
             {isLoadingTrends ? (
-              <div className="h-72 flex items-center justify-center text-slate-500">
+              <div className="h-72 flex items-center justify-center text-slate-400">
                 <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading trends data...
               </div>
             ) : trends.length === 0 ? (
-              <div className="h-72 flex items-center justify-center text-slate-500 text-sm">
+              <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
                 No reservation trend data available for this period.
               </div>
             ) : (
@@ -313,23 +313,24 @@ export default function DashboardPage() {
                   <AreaChart data={trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="colorApproved" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#059669" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#059669" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
                     <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "#0f172a",
-                        borderColor: "#334155",
-                        borderRadius: "0.5rem",
-                        color: "#fff",
+                        backgroundColor: "#ffffff",
+                        borderColor: "#e2e8f0",
+                        borderRadius: "0.75rem",
+                        color: "#0f172a",
+                        boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                         fontSize: "12px",
                       }}
                     />
@@ -337,7 +338,8 @@ export default function DashboardPage() {
                       type="monotone"
                       dataKey="active"
                       name="Active"
-                      stroke="#3b82f6"
+                      stroke="#2563eb"
+                      strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorActive)"
                     />
@@ -345,7 +347,8 @@ export default function DashboardPage() {
                       type="monotone"
                       dataKey="approved"
                       name="Approved"
-                      stroke="#10b981"
+                      stroke="#059669"
+                      strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorApproved)"
                     />
@@ -357,25 +360,25 @@ export default function DashboardPage() {
         </Card>
 
         {/* Most Rented Equipment Bar Chart / List (1 col) */}
-        <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100 shadow-lg">
+        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-lg font-semibold text-white font-heading">
+              <CardTitle className="text-lg font-bold text-slate-900 font-heading">
                 Top Rented Gear
               </CardTitle>
-              <CardDescription className="text-slate-400 text-xs mt-0.5">
+              <CardDescription className="text-slate-500 text-xs mt-0.5">
                 Highest performing equipment items
               </CardDescription>
             </div>
-            <div className="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800">
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
               {(["week", "month", "quarter"] as const).map((period) => (
                 <button
                   key={period}
                   onClick={() => setRentedPeriod(period)}
-                  className={`px-2 py-0.5 text-[11px] font-medium rounded-md transition-colors capitalize cursor-pointer ${
+                  className={`px-2 py-0.5 text-xs font-semibold rounded-lg transition-colors capitalize cursor-pointer ${
                     rentedPeriod === period
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "text-slate-400 hover:text-white"
+                      ? "bg-white text-slate-900 shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   {period}
@@ -385,34 +388,34 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="pt-4">
             {isLoadingMostRented ? (
-              <div className="h-72 flex items-center justify-center text-slate-500">
+              <div className="h-72 flex items-center justify-center text-slate-400">
                 <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading top items...
               </div>
             ) : mostRented.length === 0 ? (
-              <div className="h-72 flex items-center justify-center text-slate-500 text-sm">
+              <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
                 No equipment performance data for this period.
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {mostRented.map((item, index) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition-colors"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 hover:border-slate-300 transition-colors"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/10 text-blue-400 font-bold text-xs">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold text-xs">
                         #{index + 1}
                       </div>
                       <div className="truncate">
-                        <p className="text-xs font-semibold text-white truncate">{item.name}</p>
-                        <p className="text-[10px] text-slate-400 truncate">{item.categoryName}</p>
+                        <p className="text-xs font-semibold text-slate-900 truncate">{item.name}</p>
+                        <p className="text-[10px] text-slate-500 truncate">{item.categoryName}</p>
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <span className="text-xs font-bold text-blue-400 block">
+                      <span className="text-xs font-bold text-blue-600 block">
                         {item.totalRentals} rentals
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">
+                      <span className="text-[10px] text-slate-500 font-mono">
                         {formatCurrency(item.totalRevenue)}
                       </span>
                     </div>
@@ -425,15 +428,15 @@ export default function DashboardPage() {
       </div>
 
       {/* Activity Log Feed */}
-      <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-md text-slate-100 shadow-lg">
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <div className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-blue-400" />
+            <Activity className="h-5 w-5 text-blue-600" />
             <div>
-              <CardTitle className="text-lg font-semibold text-white font-heading">
+              <CardTitle className="text-lg font-bold text-slate-900 font-heading">
                 Audit & Activity Feed
               </CardTitle>
-              <CardDescription className="text-slate-400 text-xs">
+              <CardDescription className="text-slate-500 text-xs">
                 Real-time record of system actions and user events
               </CardDescription>
             </div>
@@ -441,21 +444,21 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           {isLoadingActivity ? (
-            <div className="p-8 text-center text-slate-500">
+            <div className="p-8 text-center text-slate-400">
               <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2" /> Loading activity log...
             </div>
           ) : activityLogs.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 text-sm">No activity recorded yet.</div>
+            <div className="p-8 text-center text-slate-400 text-sm">No activity recorded yet.</div>
           ) : (
-            <div className="divide-y divide-slate-800/80">
+            <div className="divide-y divide-slate-100">
               {activityLogs.map((log) => (
                 <div key={log.id} className="py-3 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
-                    <Badge variant={getActionBadgeVariant(log.action)} className="text-[10px] px-2 py-0.5">
+                    <Badge variant={getActionBadgeVariant(log.action)} className="text-xs">
                       {log.action}
                     </Badge>
                     <div className="truncate">
-                      <p className="text-xs font-medium text-slate-200 truncate">
+                      <p className="text-xs font-semibold text-slate-900 truncate">
                         {log.user
                           ? `${log.user.firstName} ${log.user.lastName} (${log.user.email})`
                           : "System / Anonymous User"}
@@ -475,6 +478,7 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
+
     </div>
   );
 }

@@ -12,12 +12,12 @@ interface HeaderProps {
 
 export function Header({ onMobileMenuToggle }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-slate-800 bg-slate-900/80 backdrop-blur-md px-4 md:px-8">
+    <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/80 backdrop-blur-md px-4 md:px-8 shadow-xs">
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden text-slate-300 hover:text-white"
+          className="md:hidden text-slate-600 hover:text-slate-900"
           onClick={onMobileMenuToggle}
           aria-label="Toggle mobile menu"
         >
@@ -30,9 +30,12 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
 
       <div className="flex items-center gap-3">
         <NotificationBell />
-        <div className="h-4 w-px bg-slate-800 hidden sm:block" />
+        <div className="h-4 w-px bg-slate-200 hidden sm:block" />
         <UserNav />
       </div>
     </header>
   );
 }
+
+
+
