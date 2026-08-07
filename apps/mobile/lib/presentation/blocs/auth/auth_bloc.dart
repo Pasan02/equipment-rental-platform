@@ -78,10 +78,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
       emit(const AuthFailure(message: 'Invalid response format from server'));
     } on DioException catch (e) {
-      final msg = e.response?.data?['error']?['message'] ??
-          e.response?.data?['message'] ??
-          'Login failed. Please check your credentials.';
-      emit(AuthFailure(message: msg.toString()));
+      String msg = 'Login failed. Please check your credentials.';
+      if (e.response?.data != null && e.response!.data is Map) {
+        final data = e.response!.data as Map;
+        if (data['message'] != null) {
+          msg = (data['message'] is List && (data['message'] as List).isNotEmpty)
+              ? (data['message'] as List).first.toString()
+              : data['message'].toString();
+        } else if (data['error'] != null) {
+          msg = (data['error'] is Map && data['error']['message'] != null)
+              ? data['error']['message'].toString()
+              : data['error'].toString();
+        }
+      } else if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.connectionError) {
+        msg = 'Unable to connect to server. Please verify your connection.';
+      }
+      emit(AuthFailure(message: msg));
     } catch (e) {
       emit(AuthFailure(message: 'Unexpected error: $e'));
     }
