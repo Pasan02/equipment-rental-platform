@@ -1,0 +1,886 @@
+{
+  "info": {
+    "_postman_id": "8f3b2e10-9c12-4d56-8a7e-99f2e3d1c4b5",
+    "name": "Equipment Rental Management Platform API",
+    "description": "Production-grade Postman collection for the Equipment Rental Management Platform REST API.\nIncludes full request payloads, query parameters, authentication headers, test scripts, and dynamic token auto-capture.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Auth Module",
+      "item": [
+        {
+          "name": "Register Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newcustomer@example.com\",\n  \"password\": \"Customer@123\",\n  \"name\": \"John Doe\",\n  \"phone\": \"+1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new customer account."
+          }
+        },
+        {
+          "name": "Login (Admin / Staff / Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data && jsonData.data.accessToken) {",
+                  "    pm.collectionVariables.set('accessToken', jsonData.data.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', jsonData.data.refreshToken);",
+                  "    pm.environment.set('accessToken', jsonData.data.accessToken);",
+                  "    pm.environment.set('refreshToken', jsonData.data.refreshToken);",
+                  "    console.log('Access token updated successfully');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@rental.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticate user and receive JWT access + refresh tokens. Automatically sets collection & environment accessToken."
+          }
+        },
+        {
+          "name": "Refresh Access Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Obtain a fresh JWT access token using valid refresh token."
+          }
+        },
+        {
+          "name": "Get Current Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Retrieve profile information for currently authenticated user."
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@rental.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "forgot-password"]
+            },
+            "description": "Request password reset email."
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"RESET_TOKEN_HERE\",\n  \"newPassword\": \"NewPassword@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "reset-password"]
+            },
+            "description": "Reset account password using reset token."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Invalidate active refresh token session."
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Users Module",
+      "item": [
+        {
+          "name": "List Users (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users?page=1&pageSize=10&role=CUSTOMER&search=john",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" },
+                { "key": "role", "value": "CUSTOMER" },
+                { "key": "search", "value": "john" }
+              ]
+            },
+            "description": "Get paginated user accounts list with filtering."
+          }
+        },
+        {
+          "name": "Get User Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/USER_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "USER_ID_HERE"]
+            },
+            "description": "Get user account details by ID."
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe Updated\",\n  \"phone\": \"+1987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/USER_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "USER_ID_HERE"]
+            },
+            "description": "Update user account profile information."
+          }
+        },
+        {
+          "name": "Update User Role (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"STAFF\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/USER_ID_HERE/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "USER_ID_HERE", "role"]
+            },
+            "description": "Change user security role (ADMIN only)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Categories Module",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            },
+            "description": "Get all equipment categories."
+          }
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/categories/CATEGORY_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "CATEGORY_ID_HERE"]
+            },
+            "description": "Get single equipment category details."
+          }
+        },
+        {
+          "name": "Create Category (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Drones & Aerial Systems\",\n  \"description\": \"High-definition 4K & thermal imaging camera drones\",\n  \"icon\": \"drone\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            },
+            "description": "Create a new equipment category (ADMIN only)."
+          }
+        },
+        {
+          "name": "Update Category (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Drones & Cinema Systems\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories/CATEGORY_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "CATEGORY_ID_HERE"]
+            },
+            "description": "Update category details (ADMIN only)."
+          }
+        },
+        {
+          "name": "Delete Category (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/categories/CATEGORY_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "CATEGORY_ID_HERE"]
+            },
+            "description": "Delete an equipment category (ADMIN only)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Equipment Module",
+      "item": [
+        {
+          "name": "List Equipment",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/equipment?page=1&pageSize=10&search=sony&categoryId=CAT_ID&isAvailable=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["equipment"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" },
+                { "key": "search", "value": "sony" },
+                { "key": "categoryId", "value": "CAT_ID" },
+                { "key": "isAvailable", "value": "true" }
+              ]
+            },
+            "description": "Browse and search equipment catalog with filtering and pagination."
+          }
+        },
+        {
+          "name": "Get Equipment Detail",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/equipment/EQUIPMENT_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["equipment", "EQUIPMENT_ID_HERE"]
+            },
+            "description": "Get detailed specs, stock, pricing, and images for an equipment item."
+          }
+        },
+        {
+          "name": "Create Equipment (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sony FX3 Cinema Camera\",\n  \"description\": \"Full-frame cinema camera with 4K 120fps recording capability\",\n  \"rentalPricePerDay\": 120.00,\n  \"depositAmount\": 500.00,\n  \"stockQuantity\": 5,\n  \"categoryId\": \"CATEGORY_ID_HERE\",\n  \"specifications\": {\n    \"sensor\": \"Full-frame 12.1MP\",\n    \"resolution\": \"4K UHD\",\n    \"mount\": \"Sony E-mount\"\n  },\n  \"images\": [\n    \"https://images.unsplash.com/photo-1516035069371-29a1b244cc32\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/equipment",
+              "host": ["{{baseUrl}}"],
+              "path": ["equipment"]
+            },
+            "description": "Create new equipment item in catalog (ADMIN only)."
+          }
+        },
+        {
+          "name": "Update Equipment (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rentalPricePerDay\": 125.00,\n  \"stockQuantity\": 6\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/equipment/EQUIPMENT_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["equipment", "EQUIPMENT_ID_HERE"]
+            },
+            "description": "Update equipment pricing, stock, or specifications (ADMIN only)."
+          }
+        },
+        {
+          "name": "Generate Equipment QR Code",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/equipment/EQUIPMENT_ID_HERE/qr",
+              "host": ["{{baseUrl}}"],
+              "path": ["equipment", "EQUIPMENT_ID_HERE", "qr"]
+            },
+            "description": "Generate equipment QR code PNG image for staff mobile scanning."
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Reservations Module",
+      "item": [
+        {
+          "name": "Create Reservation (Customer)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2026-08-10T09:00:00.000Z\",\n  \"endDate\": \"2026-08-15T18:00:00.000Z\",\n  \"notes\": \"Required for commercial film production\",\n  \"items\": [\n    {\n      \"equipmentId\": \"EQUIPMENT_ID_HERE\",\n      \"quantity\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reservations",
+              "host": ["{{baseUrl}}"],
+              "path": ["reservations"]
+            },
+            "description": "Create a new rental reservation."
+          }
+        },
+        {
+          "name": "List Reservations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reservations?page=1&pageSize=10&status=PENDING",
+              "host": ["{{baseUrl}}"],
+              "path": ["reservations"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" },
+                { "key": "status", "value": "PENDING" }
+              ]
+            },
+            "description": "Get reservations queue with optional status filter."
+          }
+        },
+        {
+          "name": "Get Reservation Detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reservations/RESERVATION_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["reservations", "RESERVATION_ID_HERE"]
+            },
+            "description": "Get full reservation details, items, customer info, and status history."
+          }
+        },
+        {
+          "name": "Approve Reservation (Staff / Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Approved by warehouse staff. Ready for pickup.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reservations/RESERVATION_ID_HERE/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["reservations", "RESERVATION_ID_HERE", "approve"]
+            },
+            "description": "Approve a pending reservation."
+          }
+        },
+        {
+          "name": "Reject Reservation (Staff / Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Requested equipment unavailable for selected dates\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reservations/RESERVATION_ID_HERE/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["reservations", "RESERVATION_ID_HERE", "reject"]
+            },
+            "description": "Reject a pending reservation request."
+          }
+        },
+        {
+          "name": "Activate / Pickup Reservation (Staff)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/reservations/RESERVATION_ID_HERE/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["reservations", "RESERVATION_ID_HERE", "activate"]
+            },
+            "description": "Mark approved reservation as ACTIVE upon customer pickup."
+          }
+        },
+        {
+          "name": "Process Return (Staff)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/reservations/RESERVATION_ID_HERE/return",
+              "host": ["{{baseUrl}}"],
+              "path": ["reservations", "RESERVATION_ID_HERE", "return"]
+            },
+            "description": "Mark active reservation as RETURNED upon equipment return."
+          }
+        },
+        {
+          "name": "Cancel Reservation (Customer / Staff)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/reservations/RESERVATION_ID_HERE/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["reservations", "RESERVATION_ID_HERE", "cancel"]
+            },
+            "description": "Cancel an eligible reservation."
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. Payments Module",
+      "item": [
+        {
+          "name": "Process Mock Payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reservationId\": \"RESERVATION_ID_HERE\",\n  \"amount\": 600.00,\n  \"paymentType\": \"RENTAL_FEE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments"]
+            },
+            "description": "Execute mock payment workflow for rental fee or deposit."
+          }
+        },
+        {
+          "name": "List Payments",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/payments?page=1&pageSize=10&status=PAID",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" },
+                { "key": "status", "value": "PAID" }
+              ]
+            },
+            "description": "List payment transactions with status filtering."
+          }
+        },
+        {
+          "name": "Process Refund (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/payments/PAYMENT_ID_HERE/refund",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "PAYMENT_ID_HERE", "refund"]
+            },
+            "description": "Process payment refund (ADMIN only)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "07. Inventory Module",
+      "item": [
+        {
+          "name": "Record Inventory Log (Warehouse)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"equipmentId\": \"EQUIPMENT_ID_HERE\",\n  \"action\": \"RECEIVE\",\n  \"quantity\": 2,\n  \"notes\": \"Received new stock batch from supplier\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/inventory/logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory", "logs"]
+            },
+            "description": "Log warehouse inventory operation (RECEIVE, RELEASE, DAMAGE, MAINTENANCE)."
+          }
+        },
+        {
+          "name": "List Inventory Logs",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/inventory/logs?page=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory", "logs"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" }
+              ]
+            },
+            "description": "Get inventory audit trail log."
+          }
+        }
+      ]
+    },
+    {
+      "name": "08. Notifications Module",
+      "item": [
+        {
+          "name": "List User Notifications",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            },
+            "description": "Get in-app notifications for authenticated user."
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/notifications/NOTIFICATION_ID_HERE/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "NOTIFICATION_ID_HERE", "read"]
+            },
+            "description": "Mark notification as read."
+          }
+        },
+        {
+          "name": "Mark All Notifications as Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/notifications/read-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "read-all"]
+            },
+            "description": "Mark all user notifications as read."
+          }
+        }
+      ]
+    },
+    {
+      "name": "09. Uploads Module",
+      "item": [
+        {
+          "name": "Generate S3/R2 Presigned Upload URL",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filename\": \"passport_identity.pdf\",\n  \"contentType\": \"application/pdf\",\n  \"uploadType\": \"IDENTITY_DOCUMENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/uploads/presigned-url",
+              "host": ["{{baseUrl}}"],
+              "path": ["uploads", "presigned-url"]
+            },
+            "description": "Generate presigned S3/Cloudflare R2 upload URL for document/image upload."
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Dashboard Module",
+      "item": [
+        {
+          "name": "Get Dashboard KPI Overview (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "stats"]
+            },
+            "description": "Get platform performance analytics: Total Customers, Active Rentals, Total Revenue, Utilization Rate."
+          }
+        },
+        {
+          "name": "Get Most Rented Equipment (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/most-rented",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "most-rented"]
+            },
+            "description": "Get top rented equipment ranking."
+          }
+        },
+        {
+          "name": "Get Reservation Trends (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/trends",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "trends"]
+            },
+            "description": "Get time-series reservation trend data for analytics charts."
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Activity Logs Module",
+      "item": [
+        {
+          "name": "List Activity / Audit Logs (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/activity-logs?page=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["activity-logs"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" }
+              ]
+            },
+            "description": "Get detailed system audit logs (ADMIN only)."
+          }
+        }
+      ]
+    }
+  ]
+}

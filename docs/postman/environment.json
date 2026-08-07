@@ -1,0 +1,61 @@
+{
+  "id": "e4f8d210-7b56-4c91-9a23-456789abcdef",
+  "name": "Equipment Rental Platform — Local Dev Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@rental.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "adminPassword",
+      "value": "Admin@123",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "staffEmail",
+      "value": "staff@rental.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "staffPassword",
+      "value": "Staff@123",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "customerEmail",
+      "value": "customer@rental.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customerPassword",
+      "value": "Customer@123",
+      "type": "secret",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

@@ -29,6 +29,11 @@ Thumbs.db
 *.sqlite-journal
 uploads/
 coverage/
-docs/
-requirement.txt
+
+# Agent configuration
 .agents/
+requirement.txt
+docs/implementation_plan.md
+docs/iteration_status.md
+docs/requirements-traceability-matrix.md
+docs/user-stories.md
