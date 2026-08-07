@@ -15,8 +15,6 @@ import {
   TrendingUp,
   TrendingDown,
   Activity,
-  ArrowUpRight,
-  Package,
   Clock,
   Loader2,
   RefreshCw,
@@ -25,8 +23,6 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   Tooltip,
@@ -45,9 +41,12 @@ interface DashboardStats {
 }
 
 interface MostRentedItem {
-  id: string;
-  name: string;
-  categoryName: string;
+  id?: string;
+  equipmentId?: string;
+  name?: string;
+  equipmentName?: string;
+  category?: string;
+  categoryName?: string;
   imageUrl?: string;
   totalRentals: number;
   totalRevenue: number;
@@ -87,7 +86,7 @@ export default function DashboardPage() {
     queryKey: ["dashboard", "stats"],
     queryFn: async () => {
       const res = await apiClient.get("/dashboard/stats");
-      return res.data.data as DashboardStats;
+      return (res.data?.data ?? null) as DashboardStats | null;
     },
   });
 
@@ -96,7 +95,8 @@ export default function DashboardPage() {
     queryKey: ["dashboard", "most-rented", rentedPeriod],
     queryFn: async () => {
       const res = await apiClient.get(`/dashboard/most-rented?period=${rentedPeriod}&limit=5`);
-      return res.data.data as MostRentedItem[];
+      const items = res.data?.data ?? [];
+      return Array.isArray(items) ? (items as MostRentedItem[]) : [];
     },
   });
 
@@ -105,7 +105,8 @@ export default function DashboardPage() {
     queryKey: ["dashboard", "trends", trendPeriod],
     queryFn: async () => {
       const res = await apiClient.get(`/dashboard/reservation-trends?period=${trendPeriod}`);
-      return res.data.data as TrendItem[];
+      const items = res.data?.data ?? [];
+      return Array.isArray(items) ? (items as TrendItem[]) : [];
     },
   });
 
@@ -114,7 +115,9 @@ export default function DashboardPage() {
     queryKey: ["dashboard", "activity-logs"],
     queryFn: async () => {
       const res = await apiClient.get("/activity-logs?pageSize=6");
-      return res.data.data.items as ActivityLogItem[];
+      const rawData = res.data?.data;
+      const items = Array.isArray(rawData) ? rawData : rawData?.data ?? rawData?.items ?? [];
+      return Array.isArray(items) ? (items as ActivityLogItem[]) : [];
     },
   });
 
@@ -127,159 +130,161 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Header Bar */}
+    <div className="space-y-6">
+      {/* Top Bar / Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading tracking-tight text-slate-900">
-            Dashboard Overview
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Real-time analytics, equipment performance, and reservation management.
+          <h1 className="text-2xl font-bold text-slate-900 font-heading">Dashboard Overview</h1>
+          <p className="text-slate-500 text-xs mt-1">
+            Real-time analytics, inventory performance, and activity insights
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetchStats()}
-            className="border-slate-300 bg-white text-slate-700 hover:bg-slate-50 gap-2"
-          >
-            <RefreshCw className="h-3.5 w-3.5" /> Refresh
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => refetchStats()}
+          className="border-slate-200 text-slate-700 hover:bg-slate-50 self-start sm:self-auto cursor-pointer"
+        >
+          <RefreshCw className="h-3.5 w-3.5 mr-2 text-slate-500" />
+          Refresh Data
+        </Button>
       </div>
 
-      {/* 4-Column Stat Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Card 1: Total Revenue */}
-        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm hover:border-slate-300 transition-colors">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Total Revenue
-              </span>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                <DollarSign className="h-5 w-5" />
-              </div>
+      {/* KPI Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 1. Total Revenue */}
+        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm relative overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Total Revenue
+            </CardTitle>
+            <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <DollarSign className="h-4 w-4" />
             </div>
-            <div className="mt-4">
-              <div className="text-2xl font-bold text-slate-900 font-heading">
-                {isLoadingStats ? (
-                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-                ) : (
-                  formatCurrency(stats?.totalRevenue || 0)
-                )}
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? (
+              <div className="h-7 flex items-center text-slate-400">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading...
               </div>
-              <div className="mt-2 flex items-center gap-2 text-xs">
-                {stats && stats.revenueGrowth >= 0 ? (
-                  <span className="flex items-center font-medium text-emerald-700">
-                    <TrendingUp className="mr-1 h-3.5 w-3.5" /> +{stats.revenueGrowth.toFixed(1)}%
-                  </span>
-                ) : (
-                  <span className="flex items-center font-medium text-rose-700">
-                    <TrendingDown className="mr-1 h-3.5 w-3.5" /> {stats?.revenueGrowth.toFixed(1)}%
-                  </span>
-                )}
-                <span className="text-slate-500">vs last month</span>
-              </div>
-            </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-slate-900 font-mono">
+                  {formatCurrency(stats?.totalRevenue || 0)}
+                </div>
+                <div className="flex items-center gap-1 mt-1 text-xs font-medium">
+                  {(stats?.revenueGrowth || 0) >= 0 ? (
+                    <span className="flex items-center text-emerald-600">
+                      <TrendingUp className="h-3.5 w-3.5 mr-0.5" />+{stats?.revenueGrowth}%
+                    </span>
+                  ) : (
+                    <span className="flex items-center text-rose-600">
+                      <TrendingDown className="h-3.5 w-3.5 mr-0.5" />
+                      {stats?.revenueGrowth}%
+                    </span>
+                  )}
+                  <span className="text-slate-400 font-normal">vs last month</span>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
-        {/* Card 2: Active Reservations */}
-        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm hover:border-slate-300 transition-colors">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Active Rentals
-              </span>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                <Calendar className="h-5 w-5" />
-              </div>
+        {/* 2. Active Reservations */}
+        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm relative overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Active Rentals
+            </CardTitle>
+            <div className="h-8 w-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Calendar className="h-4 w-4" />
             </div>
-            <div className="mt-4">
-              <div className="text-2xl font-bold text-slate-900 font-heading">
-                {isLoadingStats ? (
-                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-                ) : (
-                  stats?.activeReservations || 0
-                )}
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? (
+              <div className="h-7 flex items-center text-slate-400">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading...
               </div>
-              <div className="mt-2 flex items-center gap-2 text-xs">
-                <Badge variant="warning" className="text-xs">
-                  {stats?.pendingReservations || 0} Pending Approval
-                </Badge>
-              </div>
-            </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-slate-900 font-mono">
+                  {stats?.activeReservations || 0}
+                </div>
+                <div className="flex items-center gap-1 mt-1 text-xs font-medium text-amber-600">
+                  <Clock className="h-3.5 w-3.5 mr-0.5" />
+                  <span>{stats?.pendingReservations || 0} pending approval</span>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
-        {/* Card 3: Total Customers */}
-        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm hover:border-slate-300 transition-colors">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Total Customers
-              </span>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
-                <Users className="h-5 w-5" />
-              </div>
+        {/* 3. Total Customers */}
+        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm relative overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Active Customers
+            </CardTitle>
+            <div className="h-8 w-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+              <Users className="h-4 w-4" />
             </div>
-            <div className="mt-4">
-              <div className="text-2xl font-bold text-slate-900 font-heading">
-                {isLoadingStats ? (
-                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-                ) : (
-                  stats?.totalCustomers || 0
-                )}
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? (
+              <div className="h-7 flex items-center text-slate-400">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading...
               </div>
-              <div className="mt-2 text-xs text-slate-500">Registered platform accounts</div>
-            </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-slate-900 font-mono">
+                  {stats?.totalCustomers || 0}
+                </div>
+                <div className="text-xs text-slate-400 mt-1">Registered rental accounts</div>
+              </>
+            )}
           </CardContent>
         </Card>
 
-        {/* Card 4: Equipment Utilization */}
-        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm hover:border-slate-300 transition-colors">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Stock Utilization
-              </span>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-                <Percent className="h-5 w-5" />
-              </div>
+        {/* 4. Fleet Utilization */}
+        <Card className="border-slate-200 bg-white text-slate-900 shadow-sm relative overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Fleet Utilization
+            </CardTitle>
+            <div className="h-8 w-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Percent className="h-4 w-4" />
             </div>
-            <div className="mt-4">
-              <div className="text-2xl font-bold text-slate-900 font-heading">
-                {isLoadingStats ? (
-                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-                ) : (
-                  `${(stats?.equipmentUtilization || 0).toFixed(1)}%`
-                )}
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? (
+              <div className="h-7 flex items-center text-slate-400">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading...
               </div>
-              <div className="mt-2 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                <div
-                  className="bg-amber-500 h-full rounded-full transition-all duration-500"
-                  style={{ width: `${Math.min(stats?.equipmentUtilization || 0, 100)}%` }}
-                />
-              </div>
-            </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-slate-900 font-mono">
+                  {stats?.equipmentUtilization || 0}%
+                </div>
+                <div className="text-xs text-slate-400 mt-1">
+                  {stats?.totalEquipment || 0} total gear items cataloged
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Analytics Grid Section */}
+      {/* Main Content Grid: Charts & Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Reservation Trends Chart (2 cols) */}
         <Card className="lg:col-span-2 border-slate-200 bg-white text-slate-900 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-lg font-bold text-slate-900 font-heading">
-                Reservation Volume Trends
+                Reservation Volume & Status Trends
               </CardTitle>
               <CardDescription className="text-slate-500 text-xs mt-0.5">
-                Time-series distribution of rental reservations by status
+                Rental activity broken down by status over time
               </CardDescription>
             </div>
             <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
@@ -287,7 +292,7 @@ export default function DashboardPage() {
                 <button
                   key={period}
                   onClick={() => setTrendPeriod(period)}
-                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors capitalize cursor-pointer ${
+                  className={`px-2 py-0.5 text-xs font-semibold rounded-lg transition-colors capitalize cursor-pointer ${
                     trendPeriod === period
                       ? "bg-white text-slate-900 shadow-sm"
                       : "text-slate-600 hover:text-slate-900"
@@ -301,7 +306,7 @@ export default function DashboardPage() {
           <CardContent className="pt-4">
             {isLoadingTrends ? (
               <div className="h-72 flex items-center justify-center text-slate-400">
-                <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading trends data...
+                <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading trends...
               </div>
             ) : trends.length === 0 ? (
               <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
@@ -313,23 +318,26 @@ export default function DashboardPage() {
                   <AreaChart data={trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.2} />
+                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
                         <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
                       </linearGradient>
+                      <linearGradient id="colorPending" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#d97706" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#d97706" stopOpacity={0} />
+                      </linearGradient>
                       <linearGradient id="colorApproved" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#059669" stopOpacity={0.2} />
+                        <stop offset="5%" stopColor="#059669" stopOpacity={0.3} />
                         <stop offset="95%" stopColor="#059669" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
-                    <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} allowDecimals={false} />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: "#ffffff",
                         borderColor: "#e2e8f0",
-                        borderRadius: "0.75rem",
-                        color: "#0f172a",
+                        borderRadius: "0.5rem",
                         boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                         fontSize: "12px",
                       }}
@@ -342,6 +350,15 @@ export default function DashboardPage() {
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorActive)"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="pending"
+                      name="Pending"
+                      stroke="#d97706"
+                      strokeWidth={2}
+                      fillOpacity={1}
+                      fill="url(#colorPending)"
                     />
                     <Area
                       type="monotone"
@@ -359,7 +376,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Most Rented Equipment Bar Chart / List (1 col) */}
+        {/* Most Rented Equipment List (1 col) */}
         <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
@@ -397,30 +414,36 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {mostRented.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 hover:border-slate-300 transition-colors"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold text-xs">
-                        #{index + 1}
+                {mostRented.map((item, index) => {
+                  const itemId = item.equipmentId || item.id || `most-rented-${index}`;
+                  const itemName = item.equipmentName || item.name || "Equipment Item";
+                  const itemCategory = item.category || item.categoryName || "Category";
+
+                  return (
+                    <div
+                      key={itemId}
+                      className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 hover:border-slate-300 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold text-xs">
+                          #{index + 1}
+                        </div>
+                        <div className="truncate">
+                          <p className="text-xs font-semibold text-slate-900 truncate">{itemName}</p>
+                          <p className="text-[10px] text-slate-500 truncate">{itemCategory}</p>
+                        </div>
                       </div>
-                      <div className="truncate">
-                        <p className="text-xs font-semibold text-slate-900 truncate">{item.name}</p>
-                        <p className="text-[10px] text-slate-500 truncate">{item.categoryName}</p>
+                      <div className="text-right flex-shrink-0">
+                        <span className="text-xs font-bold text-blue-600 block">
+                          {item.totalRentals} rentals
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          {formatCurrency(item.totalRevenue)}
+                        </span>
                       </div>
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <span className="text-xs font-bold text-blue-600 block">
-                        {item.totalRentals} rentals
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-mono">
-                        {formatCurrency(item.totalRevenue)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>
@@ -451,8 +474,8 @@ export default function DashboardPage() {
             <div className="p-8 text-center text-slate-400 text-sm">No activity recorded yet.</div>
           ) : (
             <div className="divide-y divide-slate-100">
-              {activityLogs.map((log) => (
-                <div key={log.id} className="py-3 flex items-center justify-between gap-4">
+              {activityLogs.map((log, index) => (
+                <div key={log.id || `log-${index}`} className="py-3 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
                     <Badge variant={getActionBadgeVariant(log.action)} className="text-xs">
                       {log.action}
@@ -464,7 +487,7 @@ export default function DashboardPage() {
                           : "System / Anonymous User"}
                       </p>
                       <p className="text-[10px] text-slate-500 capitalize">
-                        Entity: {log.entityType.toLowerCase()}
+                        Entity: {log.entityType ? log.entityType.toLowerCase() : "system"}
                       </p>
                     </div>
                   </div>
@@ -478,7 +501,6 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
-
     </div>
   );
 }

@@ -151,10 +151,10 @@ export default function SettingsPage() {
     <div className="space-y-8 animate-fade-in max-w-5xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 tracking-tight">
           Account & System Settings
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-slate-500 mt-1">
           Manage your personal profile, security credentials, and business operational rules.
         </p>
       </div>

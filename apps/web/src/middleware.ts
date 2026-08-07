@@ -30,8 +30,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 2. Authenticated user attempting to access login/register
-  if (isAuthRoute && authToken) {
+  // 2. Authenticated user attempting to access login/register (allow if reason param present e.g. session expired)
+  const reason = request.nextUrl.searchParams.get("reason");
+  if (isAuthRoute && authToken && !reason) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

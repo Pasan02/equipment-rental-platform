@@ -145,7 +145,7 @@ export default function CustomersPage() {
     }
   };
 
-  const items = usersData?.items || [];
+  const items: UserItem[] = (usersData as any)?.data || usersData?.items || [];
   const meta = usersData?.meta;
 
   return (
@@ -153,7 +153,7 @@ export default function CustomersPage() {
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 tracking-tight">
             Customer Directory
           </h1>
           <p className="text-sm text-slate-500 mt-1">

@@ -43,6 +43,16 @@ apiClient.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
+export const clearAuthCookiesAndStorage = () => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    document.cookie = "auth_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "user_role=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  }
+};
+
 // Response Interceptor: Auto Refresh Token on 401
 apiClient.interceptors.response.use(
   (response) => response,
@@ -75,9 +85,7 @@ apiClient.interceptors.response.use(
 
       if (!refreshToken) {
         isRefreshing = false;
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
+        clearAuthCookiesAndStorage();
         if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
           window.location.href = "/login?reason=expired";
         }
@@ -97,6 +105,9 @@ apiClient.interceptors.response.use(
           localStorage.setItem("refreshToken", newRefreshToken);
         }
 
+        // Keep cookies in sync with new access token
+        document.cookie = `auth_token=${newAccessToken}; path=/; max-age=604800; SameSite=Lax`;
+
         apiClient.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
         if (originalRequest.headers) {
           originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
@@ -106,9 +117,7 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
+        clearAuthCookiesAndStorage();
         if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
           window.location.href = "/login?reason=session_expired";
         }

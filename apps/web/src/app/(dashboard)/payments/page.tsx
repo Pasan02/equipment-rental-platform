@@ -179,7 +179,7 @@ export default function PaymentsPage() {
     });
   };
 
-  const items = paymentsData?.items || [];
+  const items: PaymentItem[] = (paymentsData as any)?.data || paymentsData?.items || [];
   const meta = paymentsData?.meta;
 
   return (
@@ -187,10 +187,10 @@ export default function PaymentsPage() {
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 tracking-tight">
             Payments & Transactions
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Track rental payments, security deposit records, damages, and refunds.
           </p>
         </div>

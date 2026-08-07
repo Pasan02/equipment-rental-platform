@@ -289,7 +289,7 @@ export default function ReservationsPage() {
     }
   };
 
-  const items = reservationData?.items || [];
+  const items: Reservation[] = (reservationData as any)?.data || reservationData?.items || [];
   const meta = reservationData?.meta;
 
   const STATUS_TABS = ["ALL", "PENDING", "APPROVED", "ACTIVE", "RETURNED", "CANCELLED"];
@@ -299,10 +299,10 @@ export default function ReservationsPage() {
       {/* Header & Primary Action */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 tracking-tight">
             Reservation Lifecycle
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Track, approve, activate, and manage equipment reservations.
           </p>
         </div>

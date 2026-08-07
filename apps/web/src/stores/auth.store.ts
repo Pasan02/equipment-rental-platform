@@ -91,6 +91,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (accessToken && refreshToken && userJson) {
         const user = JSON.parse(userJson) as IUser;
+        document.cookie = `auth_token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+        document.cookie = `user_role=${user.role}; path=/; max-age=604800; SameSite=Lax`;
         set({
           user,
           accessToken,
@@ -100,6 +102,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           hasHydrated: true,
         });
       } else {
+        document.cookie = "auth_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "user_role=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         set({
           user: null,
           accessToken: null,
@@ -110,6 +114,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
       }
     } catch {
+      document.cookie = "auth_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie = "user_role=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       set({
         user: null,
         accessToken: null,

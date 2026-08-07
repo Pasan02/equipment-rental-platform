@@ -143,6 +143,8 @@ export default function EquipmentPage() {
     },
   });
 
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
   // Create Equipment Mutation
   const createMutation = useMutation({
     mutationFn: async (payload: any) => {
@@ -151,7 +153,9 @@ export default function EquipmentPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["equipment"] });
+      setSuccessMsg("Equipment item created successfully!");
       closeModal();
+      setTimeout(() => setSuccessMsg(null), 5000);
     },
     onError: (err: any) => {
       const msg = err.response?.data?.error?.message || "Failed to create equipment item.";
@@ -167,7 +171,9 @@ export default function EquipmentPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["equipment"] });
+      setSuccessMsg("Equipment item updated successfully!");
       closeModal();
+      setTimeout(() => setSuccessMsg(null), 5000);
     },
     onError: (err: any) => {
       const msg = err.response?.data?.error?.message || "Failed to update equipment item.";
@@ -182,6 +188,8 @@ export default function EquipmentPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["equipment"] });
+      setSuccessMsg("Equipment status updated.");
+      setTimeout(() => setSuccessMsg(null), 4000);
     },
   });
 
@@ -193,6 +201,8 @@ export default function EquipmentPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["equipment"] });
       setDeletingId(null);
+      setSuccessMsg("Equipment item deleted.");
+      setTimeout(() => setSuccessMsg(null), 4000);
     },
   });
 
@@ -297,7 +307,7 @@ export default function EquipmentPage() {
     }
   };
 
-  const items = equipmentData?.items || [];
+  const items: EquipmentItem[] = (equipmentData as any)?.data || equipmentData?.items || [];
   const meta = equipmentData?.meta;
 
   return (
@@ -305,10 +315,10 @@ export default function EquipmentPage() {
       {/* Header & Controls */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 tracking-tight">
             Equipment Catalog
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Browse, manage inventory, and configure rental equipment.
           </p>
         </div>
@@ -321,6 +331,19 @@ export default function EquipmentPage() {
           </Button>
         )}
       </div>
+
+      {/* Success Notification Banner */}
+      {successMsg && (
+        <div className="flex items-center justify-between rounded-xl bg-emerald-50 border border-emerald-200 p-3.5 text-xs text-emerald-800 animate-fade-in shadow-xs">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+            <span className="font-semibold">{successMsg}</span>
+          </div>
+          <button onClick={() => setSuccessMsg(null)} className="text-emerald-500 hover:text-emerald-700 cursor-pointer">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* Search and Filters */}
       <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">

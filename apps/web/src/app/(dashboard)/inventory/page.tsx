@@ -244,10 +244,10 @@ export default function InventoryPage() {
       {/* Header & Operations Bar */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 tracking-tight">
             Warehouse Inventory
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Real-time stock levels, warehouse ops, damage reporting, and maintenance.
           </p>
         </div>
@@ -271,8 +271,7 @@ export default function InventoryPage() {
             <Button
               onClick={() => openModal("MAINTENANCE")}
               size="sm"
-              variant="outline"
-              className="border-slate-800 bg-slate-900 text-amber-400 hover:bg-amber-950/40 gap-1.5 cursor-pointer"
+              className="bg-amber-600 hover:bg-amber-500 text-white gap-1.5 cursor-pointer shadow-md shadow-amber-600/20"
             >
               <Wrench className="h-4 w-4" /> Maintenance
             </Button>
@@ -280,9 +279,9 @@ export default function InventoryPage() {
               onClick={() => openModal("DAMAGE")}
               size="sm"
               variant="outline"
-              className="border-slate-800 bg-slate-900 text-rose-400 hover:bg-rose-950/40 gap-1.5 cursor-pointer"
+              className="border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 gap-1.5 cursor-pointer"
             >
-              <AlertTriangle className="h-4 w-4" /> Report Damage
+              <AlertTriangle className="h-4 w-4 text-rose-600" /> Damage Log
             </Button>
           </div>
         )}
@@ -290,38 +289,38 @@ export default function InventoryPage() {
 
       {/* 4-Card Summary Header */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-slate-800 bg-slate-900/80 p-5">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+        <Card className="border-slate-200 bg-white shadow-sm p-5">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
             Catalog Items
           </span>
-          <span className="text-2xl font-bold text-white font-heading">
+          <span className="text-2xl font-bold text-slate-900 font-heading">
             {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : stockSummary?.totalEquipment || 0}
           </span>
         </Card>
 
-        <Card className="border-slate-800 bg-slate-900/80 p-5">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+        <Card className="border-slate-200 bg-white shadow-sm p-5">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
             Total Stock Quantity
           </span>
-          <span className="text-2xl font-bold text-white font-heading">
+          <span className="text-2xl font-bold text-slate-900 font-heading">
             {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : stockSummary?.totalStock || 0}
           </span>
         </Card>
 
-        <Card className="border-slate-800 bg-slate-900/80 p-5">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+        <Card className="border-slate-200 bg-white shadow-sm p-5">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
             Available On Shelf
           </span>
-          <span className="text-2xl font-bold text-emerald-400 font-heading">
+          <span className="text-2xl font-bold text-emerald-600 font-heading">
             {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : stockSummary?.availableStock || 0}
           </span>
         </Card>
 
-        <Card className="border-slate-800 bg-slate-900/80 p-5">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+        <Card className="border-slate-200 bg-white shadow-sm p-5">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
             Stock Utilization
           </span>
-          <span className="text-2xl font-bold text-blue-400 font-heading">
+          <span className="text-2xl font-bold text-blue-600 font-heading">
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
