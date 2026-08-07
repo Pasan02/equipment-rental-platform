@@ -29,7 +29,7 @@ services:
 
   api:
     build:
-      context: ..
+      context: .
       dockerfile: docker/Dockerfile.api
     container_name: equipment_rental_api
     restart: always
@@ -59,7 +59,7 @@ services:
 
   web:
     build:
-      context: ..
+      context: .
       dockerfile: docker/Dockerfile.web
     container_name: equipment_rental_web
     restart: always

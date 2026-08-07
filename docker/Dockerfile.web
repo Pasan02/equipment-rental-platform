@@ -1,0 +1,49 @@
+# Multi-stage Dockerfile for Next.js Web Application (Monorepo)
+
+# Stage 1: Build stage
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+RUN apk add --no-cache libc6-compat
+
+# Copy workspace metadata files
+COPY package.json package-lock.json turbo.json tsconfig.json ./
+COPY packages/shared-types ./packages/shared-types
+COPY apps/web ./apps/web
+
+# Install dependencies
+RUN npm ci
+
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+# Build web application
+RUN npm run build --workspace=web
+
+# Stage 2: Production Runner
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3001
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN apk add --no-cache curl
+
+# Create non-root system user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+COPY package.json package-lock.json turbo.json tsconfig.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/shared-types ./packages/shared-types
+COPY --from=builder /app/apps/web ./apps/web
+
+USER nextjs
+
+EXPOSE 3001
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -f http://localhost:3001 || exit 1
+
+CMD ["npm", "run", "start", "--workspace=web"]
