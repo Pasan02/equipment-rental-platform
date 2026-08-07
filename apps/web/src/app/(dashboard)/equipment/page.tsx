@@ -501,24 +501,26 @@ export default function EquipmentPage() {
                           </Button>
                         </Link>
                         {canManage && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-slate-500 hover:text-blue-600"
-                              onClick={() => openEditModal(item)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-slate-500 hover:text-rose-600"
-                              onClick={() => setDeletingId(item.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-slate-500 hover:text-blue-600"
+                            onClick={() => openEditModal(item)}
+                            title="Edit equipment details"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {isAdmin && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-slate-500 hover:text-rose-600"
+                            onClick={() => setDeletingId(item.id)}
+                            title="Delete equipment"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         )}
                       </div>
                     </td>

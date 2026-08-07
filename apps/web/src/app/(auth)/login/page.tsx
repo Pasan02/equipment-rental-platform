@@ -55,8 +55,12 @@ function LoginForm() {
 
       setAuth(user, accessToken, refreshToken);
       const targetPath =
-        user.role === "WAREHOUSE" && (redirect === "/dashboard" || !redirect)
-          ? "/inventory"
+        redirect === "/dashboard" || !redirect
+          ? user.role === "WAREHOUSE"
+            ? "/inventory"
+            : user.role === "STAFF"
+            ? "/reservations"
+            : redirect
           : redirect;
       router.push(targetPath);
     } catch (err: any) {

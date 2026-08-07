@@ -71,8 +71,9 @@ interface InventoryLog {
 export default function InventoryPage() {
   const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
-  const isWarehouseOrAdmin =
-    user?.role === "ADMIN" || user?.role === "STAFF" || user?.role === "WAREHOUSE";
+  const userRole = user?.role || "CUSTOMER";
+  const isWarehouseOrAdmin = userRole === "ADMIN" || userRole === "WAREHOUSE";
+  const isStaff = userRole === "STAFF";
 
   // Search filter state
   const [search, setSearch] = useState("");
@@ -289,15 +290,17 @@ export default function InventoryPage() {
           </p>
         </div>
 
-        {isWarehouseOrAdmin && (
+        {(isWarehouseOrAdmin || isStaff) && (
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              onClick={() => openModal("RECEIVE")}
-              size="sm"
-              className="bg-emerald-600 hover:bg-emerald-500 text-white gap-1.5 cursor-pointer shadow-md shadow-emerald-600/20"
-            >
-              <ArrowDownLeft className="h-4 w-4" /> Receive Stock
-            </Button>
+            {isWarehouseOrAdmin && (
+              <Button
+                onClick={() => openModal("RECEIVE")}
+                size="sm"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white gap-1.5 cursor-pointer shadow-md shadow-emerald-600/20"
+              >
+                <ArrowDownLeft className="h-4 w-4" /> Receive Stock
+              </Button>
+            )}
             <Button
               onClick={() => openModal("RELEASE")}
               size="sm"
@@ -305,21 +308,25 @@ export default function InventoryPage() {
             >
               <ArrowUpRight className="h-4 w-4" /> Release Stock
             </Button>
-            <Button
-              onClick={() => openModal("MAINTENANCE")}
-              size="sm"
-              className="bg-amber-600 hover:bg-amber-500 text-white gap-1.5 cursor-pointer shadow-md shadow-amber-600/20"
-            >
-              <Wrench className="h-4 w-4" /> Maintenance
-            </Button>
-            <Button
-              onClick={() => openModal("DAMAGE")}
-              size="sm"
-              variant="outline"
-              className="border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 gap-1.5 cursor-pointer"
-            >
-              <AlertTriangle className="h-4 w-4 text-rose-600" /> Damage Log
-            </Button>
+            {isWarehouseOrAdmin && (
+              <>
+                <Button
+                  onClick={() => openModal("MAINTENANCE")}
+                  size="sm"
+                  className="bg-amber-600 hover:bg-amber-500 text-white gap-1.5 cursor-pointer shadow-md shadow-amber-600/20"
+                >
+                  <Wrench className="h-4 w-4" /> Maintenance
+                </Button>
+                <Button
+                  onClick={() => openModal("DAMAGE")}
+                  size="sm"
+                  variant="outline"
+                  className="border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 gap-1.5 cursor-pointer"
+                >
+                  <AlertTriangle className="h-4 w-4 text-rose-600" /> Damage Log
+                </Button>
+              </>
+            )}
           </div>
         )}
       </div>

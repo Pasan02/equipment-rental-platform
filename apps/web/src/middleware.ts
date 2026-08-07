@@ -33,20 +33,24 @@ export function middleware(request: NextRequest) {
   // 2. Authenticated user attempting to access login/register (allow if reason param present e.g. session expired)
   const reason = request.nextUrl.searchParams.get("reason");
   if (isAuthRoute && authToken && !reason) {
-    const defaultHome = userRole === "WAREHOUSE" ? "/inventory" : "/dashboard";
+    let defaultHome = "/dashboard";
+    if (userRole === "WAREHOUSE") defaultHome = "/inventory";
+    if (userRole === "STAFF") defaultHome = "/reservations";
     return NextResponse.redirect(new URL(defaultHome, request.url));
   }
 
   // 3. Role-based path restrictions
   if (authToken && userRole) {
-    // Warehouse users redirected to /inventory if attempting to access /dashboard
-    if (pathname.startsWith("/dashboard") && userRole === "WAREHOUSE") {
-      return NextResponse.redirect(new URL("/inventory", request.url));
+    // Non-admin users redirected away from /dashboard to their primary workspace
+    if (pathname.startsWith("/dashboard")) {
+      if (userRole === "WAREHOUSE") return NextResponse.redirect(new URL("/inventory", request.url));
+      if (userRole === "STAFF") return NextResponse.redirect(new URL("/reservations", request.url));
     }
 
     // Customers route restricted to ADMIN only
     if (pathname.startsWith("/customers") && userRole !== "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      const home = userRole === "STAFF" ? "/reservations" : userRole === "WAREHOUSE" ? "/inventory" : "/dashboard";
+      return NextResponse.redirect(new URL(home, request.url));
     }
 
     // Inventory route restricted to ADMIN, STAFF, and WAREHOUSE

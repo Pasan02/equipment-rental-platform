@@ -82,6 +82,8 @@ export default function DashboardPage() {
   useEffect(() => {
     if (user?.role === "WAREHOUSE") {
       router.replace("/inventory");
+    } else if (user?.role === "STAFF") {
+      router.replace("/reservations");
     }
   }, [user, router]);
 

@@ -316,7 +316,7 @@ export default function ReservationsPage() {
             Track, approve, activate, and manage equipment reservations.
           </p>
         </div>
-        {!isWarehouse && (
+        {(isCustomer || isAdmin) && (
           <Button
             onClick={() => setIsCreateModalOpen(true)}
             className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/25 gap-2 cursor-pointer"

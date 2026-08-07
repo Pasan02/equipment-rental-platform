@@ -35,7 +35,7 @@ const NAV_ITEMS: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ["ADMIN", "STAFF", "CUSTOMER"],
+    roles: ["ADMIN", "CUSTOMER"],
   },
   {
     title: "Equipment",
@@ -76,7 +76,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
   const userRole = user?.role || "CUSTOMER";
-  const homeHref = userRole === "WAREHOUSE" ? "/inventory" : "/dashboard";
+  const homeHref =
+    userRole === "WAREHOUSE"
+      ? "/inventory"
+      : userRole === "STAFF"
+      ? "/reservations"
+      : "/dashboard";
 
   // Filter links based on user role
   const filteredNavItems = NAV_ITEMS.filter(
