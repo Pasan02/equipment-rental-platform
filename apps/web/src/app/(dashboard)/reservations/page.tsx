@@ -131,7 +131,9 @@ export default function ReservationsPage() {
     queryKey: ["equipment-options"],
     queryFn: async () => {
       const res = await apiClient.get("/equipment?pageSize=100&available=true");
-      return res.data.data.items as EquipmentOption[];
+      const rawData = res.data?.data;
+      const list = Array.isArray(rawData) ? rawData : rawData?.items || [];
+      return list as EquipmentOption[];
     },
     enabled: isCreateModalOpen,
   });
@@ -151,8 +153,9 @@ export default function ReservationsPage() {
       if (toDate) params.append("toDate", toDate);
 
       const res = await apiClient.get(`/reservations?${params.toString()}`);
-      return res.data.data as {
-        items: Reservation[];
+      return res.data as {
+        success: boolean;
+        data: Reservation[];
         meta: {
           total: number;
           page: number;
@@ -289,7 +292,11 @@ export default function ReservationsPage() {
     }
   };
 
-  const items: Reservation[] = (reservationData as any)?.data || reservationData?.items || [];
+  const items: Reservation[] = Array.isArray(reservationData?.data)
+    ? reservationData.data
+    : Array.isArray(reservationData)
+    ? (reservationData as Reservation[])
+    : [];
   const meta = reservationData?.meta;
 
   const STATUS_TABS = ["ALL", "PENDING", "APPROVED", "ACTIVE", "RETURNED", "CANCELLED"];

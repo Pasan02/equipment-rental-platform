@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 
 interface InventoryStockItem {
+  id?: string;
   equipmentId: string;
   name: string;
   categoryName: string;
@@ -41,10 +42,14 @@ interface InventoryStockItem {
 }
 
 interface InventorySummary {
-  totalEquipment: number;
-  totalStock: number;
-  availableStock: number;
-  utilizationPercentage: number;
+  totalEquipment?: number;
+  totalEquipmentCount?: number;
+  totalStock?: number;
+  totalStockQuantity?: number;
+  availableStock?: number;
+  totalAvailableQuantity?: number;
+  utilizationPercentage?: number;
+  utilizationRatePercent?: number;
 }
 
 interface InventoryLog {
@@ -114,16 +119,24 @@ export default function InventoryPage() {
       const res = await apiClient.get(
         `/inventory/${historyEquipment.id}/history?page=${historyPage}&pageSize=6`
       );
-      return res.data.data as {
-        items: InventoryLog[];
-        meta: {
+      const dataObj = res.data?.data || res.data;
+      return {
+        items: (dataObj?.items || []) as InventoryLog[],
+        meta: (dataObj?.meta || {
+          total: 0,
+          page: 1,
+          pageSize: 6,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPrevPage: false,
+        }) as {
           total: number;
           page: number;
           pageSize: number;
           totalPages: number;
           hasNextPage: boolean;
           hasPrevPage: boolean;
-        };
+        },
       };
     },
     enabled: !!historyEquipment,
@@ -150,9 +163,31 @@ export default function InventoryPage() {
     },
   });
 
+  const stockSummary = stockData?.summary;
+  const stockItems: InventoryStockItem[] = (stockData?.items || [])
+    .map((item: any) => ({
+      id: item.id || item.equipmentId,
+      equipmentId: item.id || item.equipmentId,
+      name: item.name || "Equipment",
+      categoryName: item.category?.name || item.categoryName || "Gear",
+      totalStock: item.stockQuantity ?? item.totalStock ?? 0,
+      available: item.availableQuantity ?? item.available ?? 0,
+      reserved: item.reservedQuantity ?? item.reserved ?? 0,
+      maintenance: item.maintenance ?? 0,
+      damaged: item.damaged ?? 0,
+    }))
+    .filter((item: InventoryStockItem) => {
+      const itemName = item.name || "";
+      const catName = item.categoryName || "";
+      return (
+        itemName.toLowerCase().includes(search.toLowerCase()) ||
+        catName.toLowerCase().includes(search.toLowerCase())
+      );
+    });
+
   const openModal = (type: "RECEIVE" | "RELEASE" | "DAMAGE" | "MAINTENANCE") => {
     setActionForm({
-      equipmentId: stockItems[0]?.equipmentId || "",
+      equipmentId: stockItems[0]?.equipmentId || stockItems[0]?.id || "",
       quantity: "1",
       notes: "",
       chargeDamageFee: false,
@@ -210,13 +245,6 @@ export default function InventoryPage() {
 
     actionMutation.mutate({ endpoint, payload });
   };
-
-  const stockSummary = stockData?.summary;
-  const stockItems = (stockData?.items || []).filter(
-    (item) =>
-      item.name.toLowerCase().includes(search.toLowerCase()) ||
-      item.categoryName.toLowerCase().includes(search.toLowerCase())
-  );
 
   const getStockHealthIndicator = (available: number, total: number) => {
     if (available === 0) return "bg-rose-500 text-rose-400 border-rose-500/30";
@@ -294,7 +322,11 @@ export default function InventoryPage() {
             Catalog Items
           </span>
           <span className="text-2xl font-bold text-slate-900 font-heading">
-            {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : stockSummary?.totalEquipment || 0}
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              stockSummary?.totalEquipmentCount ?? stockSummary?.totalEquipment ?? 0
+            )}
           </span>
         </Card>
 
@@ -303,7 +335,11 @@ export default function InventoryPage() {
             Total Stock Quantity
           </span>
           <span className="text-2xl font-bold text-slate-900 font-heading">
-            {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : stockSummary?.totalStock || 0}
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              stockSummary?.totalStockQuantity ?? stockSummary?.totalStock ?? 0
+            )}
           </span>
         </Card>
 
@@ -312,7 +348,11 @@ export default function InventoryPage() {
             Available On Shelf
           </span>
           <span className="text-2xl font-bold text-emerald-600 font-heading">
-            {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : stockSummary?.availableStock || 0}
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              stockSummary?.totalAvailableQuantity ?? stockSummary?.availableStock ?? 0
+            )}
           </span>
         </Card>
 
@@ -324,7 +364,11 @@ export default function InventoryPage() {
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              `${(stockSummary?.utilizationPercentage || 0).toFixed(1)}%`
+              `${(
+                stockSummary?.utilizationRatePercent ??
+                stockSummary?.utilizationPercentage ??
+                0
+              ).toFixed(1)}%`
             )}
           </span>
         </Card>
@@ -590,7 +634,7 @@ export default function InventoryPage() {
           )}
 
           {/* History Pagination */}
-          {historyData && historyData.meta.totalPages > 1 && (
+          {historyData?.meta && historyData.meta.totalPages > 1 && (
             <div className="flex items-center justify-between pt-2 text-slate-600">
               <span>
                 Page {historyData.meta.page} of {historyData.meta.totalPages}

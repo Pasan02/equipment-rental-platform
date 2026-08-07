@@ -92,8 +92,9 @@ export default function PaymentsPage() {
       if (typeFilter) params.append("type", typeFilter);
 
       const res = await apiClient.get(`/payments?${params.toString()}`);
-      return res.data.data as {
-        items: PaymentItem[];
+      return res.data as {
+        success: boolean;
+        data: PaymentItem[];
         meta: {
           total: number;
           page: number;
@@ -179,7 +180,11 @@ export default function PaymentsPage() {
     });
   };
 
-  const items: PaymentItem[] = (paymentsData as any)?.data || paymentsData?.items || [];
+  const items: PaymentItem[] = Array.isArray(paymentsData?.data)
+    ? paymentsData.data
+    : Array.isArray(paymentsData)
+    ? (paymentsData as PaymentItem[])
+    : [];
   const meta = paymentsData?.meta;
 
   return (

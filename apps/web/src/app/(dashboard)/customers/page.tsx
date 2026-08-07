@@ -84,8 +84,9 @@ export default function CustomersPage() {
       if (roleFilter) params.append("role", roleFilter);
 
       const res = await apiClient.get(`/users?${params.toString()}`);
-      let data = res.data.data as {
-        items: UserItem[];
+      const payload = res.data as {
+        success: boolean;
+        data: UserItem[];
         meta: {
           total: number;
           page: number;
@@ -96,13 +97,22 @@ export default function CustomersPage() {
         };
       };
 
+      let userList = Array.isArray(payload?.data)
+        ? payload.data
+        : Array.isArray(payload)
+        ? (payload as unknown as UserItem[])
+        : [];
+
       // Client-side filter for active status if specified
       if (statusFilter !== "all") {
         const isActiveBool = statusFilter === "active";
-        data.items = data.items.filter((u) => u.isActive === isActiveBool);
+        userList = userList.filter((u) => u.isActive === isActiveBool);
       }
 
-      return data;
+      return {
+        data: userList,
+        meta: payload?.meta,
+      };
     },
   });
 
@@ -145,7 +155,11 @@ export default function CustomersPage() {
     }
   };
 
-  const items: UserItem[] = (usersData as any)?.data || usersData?.items || [];
+  const items: UserItem[] = Array.isArray(usersData?.data)
+    ? usersData.data
+    : Array.isArray(usersData)
+    ? (usersData as UserItem[])
+    : [];
   const meta = usersData?.meta;
 
   return (
