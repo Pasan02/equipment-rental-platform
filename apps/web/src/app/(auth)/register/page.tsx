@@ -3,21 +3,22 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { apiClient } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Eye, EyeOff, AlertCircle, User, Mail, Phone, Lock } from "lucide-react";
+import { CountryPhoneInput } from "@/components/ui/country-phone-input";
+import { Eye, EyeOff, AlertCircle, User, Mail, Lock } from "lucide-react";
 
 const registerSchema = z
   .object({
     firstName: z.string().min(1, "First name is required").max(50),
     lastName: z.string().min(1, "Last name is required").max(50),
     email: z.string().min(1, "Email is required").email("Invalid email address"),
-    phone: z.string().min(10, "Phone number must be at least 10 digits"),
+    phone: z.string().optional(),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
@@ -43,6 +44,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -97,7 +99,9 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">First Name</label>
+              <label className="text-xs font-semibold text-slate-700">
+                First Name <span className="text-rose-500">*</span>
+              </label>
               <div className="relative">
                 <User className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                 <Input
@@ -109,7 +113,9 @@ export default function RegisterPage() {
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">Last Name</label>
+              <label className="text-xs font-semibold text-slate-700">
+                Last Name <span className="text-rose-500">*</span>
+              </label>
               <Input
                 {...register("lastName")}
                 placeholder="Doe"
@@ -120,7 +126,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700">Email Address</label>
+            <label className="text-xs font-semibold text-slate-700">
+              Email Address <span className="text-rose-500">*</span>
+            </label>
             <div className="relative">
               <Mail className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <Input
@@ -134,21 +142,26 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700">Phone Number</label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-              <Input
-                {...register("phone")}
-                type="tel"
-                placeholder="+1 (555) 000-0000"
-                className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400"
-                error={errors.phone?.message}
-              />
-            </div>
+            <label className="text-xs font-semibold text-slate-700">
+              Phone Number <span className="text-slate-400 font-normal">(Optional)</span>
+            </label>
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field }) => (
+                <CountryPhoneInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.phone?.message}
+                />
+              )}
+            />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700">Password</label>
+            <label className="text-xs font-semibold text-slate-700">
+              Password <span className="text-rose-500">*</span>
+            </label>
             <div className="relative">
               <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <Input
@@ -170,7 +183,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700">Confirm Password</label>
+            <label className="text-xs font-semibold text-slate-700">
+              Confirm Password <span className="text-rose-500">*</span>
+            </label>
             <div className="relative">
               <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <Input
@@ -207,3 +222,4 @@ export default function RegisterPage() {
     </Card>
   );
 }
+
