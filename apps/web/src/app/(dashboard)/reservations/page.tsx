@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
 import { FileUpload } from "@/components/ui/file-upload";
+import { SearchableEquipmentSelect } from "@/components/ui/searchable-equipment-select";
 import {
   Search,
   Plus,
@@ -810,22 +811,18 @@ export default function ReservationsPage() {
         )}
 
         <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs">
-          <div className="space-y-1.5">
-            <label className="font-semibold text-slate-700">Select Equipment *</label>
-            <select
-              value={createFormData.equipmentId}
-              onChange={(e) => setCreateFormData({ ...createFormData, equipmentId: e.target.value })}
-              className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-xs"
-              required
-            >
-              <option value="">Choose Equipment Item...</option>
-              {equipmentOptions.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name} — ${item.rentalPricePerDay}/day ({item.availableQuantity} available)
-                </option>
-              ))}
-            </select>
-          </div>
+          <SearchableEquipmentSelect
+            options={equipmentOptions.map((item) => ({
+              id: item.id,
+              name: item.name,
+              subtext: `$${item.rentalPricePerDay}/day • ${item.availableQuantity} available`,
+            }))}
+            value={createFormData.equipmentId}
+            onChange={(id) => setCreateFormData({ ...createFormData, equipmentId: id })}
+            label="Select Equipment"
+            placeholder="Search equipment by name or rate..."
+            required
+          />
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">

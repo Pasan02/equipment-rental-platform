@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
+import { SearchableEquipmentSelect } from "@/components/ui/searchable-equipment-select";
 import {
   Boxes,
   Search,
@@ -542,21 +543,19 @@ export default function InventoryPage() {
         )}
 
         <form onSubmit={handleActionSubmit} className="space-y-4 text-xs">
-          <div className="space-y-1.5">
-            <label className="font-semibold text-slate-700">Select Equipment *</label>
-            <select
-              value={actionForm.equipmentId}
-              onChange={(e) => setActionForm({ ...actionForm, equipmentId: e.target.value })}
-              className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-xs"
-              required
-            >
-              {stockItems.map((item) => (
-                <option key={item.equipmentId} value={item.equipmentId}>
-                  {item.name} ({item.available} available / {item.totalStock} total)
-                </option>
-              ))}
-            </select>
-          </div>
+          <SearchableEquipmentSelect
+            options={stockItems.map((item) => ({
+              id: item.equipmentId,
+              name: item.name,
+              categoryName: item.categoryName,
+              subtext: `Avail: ${item.available} / Total: ${item.totalStock}`,
+            }))}
+            value={actionForm.equipmentId}
+            onChange={(id) => setActionForm({ ...actionForm, equipmentId: id })}
+            label="Select Equipment"
+            placeholder="Search stock by equipment name or category..."
+            required
+          />
 
           <div className="space-y-1.5">
             <label className="font-semibold text-slate-700">Quantity *</label>
