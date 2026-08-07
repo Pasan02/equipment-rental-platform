@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
-import '../../../domain/entities/category_entity.dart';
 import '../../../domain/entities/equipment_entity.dart';
 import '../../blocs/equipment/equipment_bloc.dart';
 import '../../blocs/equipment/equipment_event.dart';

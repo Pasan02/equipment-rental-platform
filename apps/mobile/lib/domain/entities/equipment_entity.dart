@@ -51,8 +51,10 @@ class EquipmentEntity extends Equatable {
 
   String get primaryImageUrl {
     if (images.isEmpty) return '';
-    final primary = images.firstWhere((img) => img.isPrimary, orElse: () => images.first);
-    return primary.imageUrl;
+    for (final img in images) {
+      if (img.isPrimary) return img.imageUrl;
+    }
+    return images.first.imageUrl;
   }
 
   bool get isAvailable => availableQuantity > 0 && isActive;

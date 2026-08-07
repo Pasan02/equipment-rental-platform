@@ -49,7 +49,7 @@ class EquipmentModel extends EquipmentEntity {
     var rawPrice = json['rentalPricePerDay'] ?? json['rental_price_per_day'] ?? 0;
     var rawDeposit = json['depositAmount'] ?? json['deposit_amount'] ?? 0;
 
-    List<EquipmentImageModel> imgList = [];
+    List<EquipmentImageEntity> imgList = [];
     if (json['images'] != null && json['images'] is List) {
       imgList = (json['images'] as List)
           .map((i) => EquipmentImageModel.fromJson(i))

@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/datasources/equipment_remote_datasource.dart';
-import '../../../domain/entities/category_entity.dart';
 import '../../../domain/entities/equipment_entity.dart';
 import 'equipment_event.dart';
 import 'equipment_state.dart';

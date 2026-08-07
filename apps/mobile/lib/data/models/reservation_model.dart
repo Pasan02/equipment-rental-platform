@@ -65,7 +65,7 @@ class ReservationModel extends ReservationEntity {
       cust = UserModel.fromJson(json['customer']);
     }
 
-    List<ReservationItemModel> itemList = [];
+    List<ReservationItemEntity> itemList = [];
     if (json['items'] != null && json['items'] is List) {
       itemList = (json['items'] as List)
           .map((i) => ReservationItemModel.fromJson(i))
