@@ -36,6 +36,7 @@ export function middleware(request: NextRequest) {
     let defaultHome = "/dashboard";
     if (userRole === "WAREHOUSE") defaultHome = "/inventory";
     if (userRole === "STAFF") defaultHome = "/reservations";
+    if (userRole === "CUSTOMER") defaultHome = "/equipment";
     return NextResponse.redirect(new URL(defaultHome, request.url));
   }
 
@@ -45,17 +46,24 @@ export function middleware(request: NextRequest) {
     if (pathname.startsWith("/dashboard")) {
       if (userRole === "WAREHOUSE") return NextResponse.redirect(new URL("/inventory", request.url));
       if (userRole === "STAFF") return NextResponse.redirect(new URL("/reservations", request.url));
+      if (userRole === "CUSTOMER") return NextResponse.redirect(new URL("/equipment", request.url));
     }
 
     // Customers route restricted to ADMIN only
     if (pathname.startsWith("/customers") && userRole !== "ADMIN") {
-      const home = userRole === "STAFF" ? "/reservations" : userRole === "WAREHOUSE" ? "/inventory" : "/dashboard";
+      const home = userRole === "STAFF" ? "/reservations" : userRole === "WAREHOUSE" ? "/inventory" : "/equipment";
+      return NextResponse.redirect(new URL(home, request.url));
+    }
+
+    // Payments route restricted to ADMIN and STAFF only
+    if (pathname.startsWith("/payments") && !["ADMIN", "STAFF"].includes(userRole)) {
+      const home = userRole === "WAREHOUSE" ? "/inventory" : "/equipment";
       return NextResponse.redirect(new URL(home, request.url));
     }
 
     // Inventory route restricted to ADMIN, STAFF, and WAREHOUSE
     if (pathname.startsWith("/inventory") && !["ADMIN", "STAFF", "WAREHOUSE"].includes(userRole)) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/equipment", request.url));
     }
   }
 

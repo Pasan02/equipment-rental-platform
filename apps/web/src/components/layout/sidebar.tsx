@@ -35,7 +35,7 @@ const NAV_ITEMS: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ["ADMIN", "CUSTOMER"],
+    roles: ["ADMIN"],
   },
   {
     title: "Equipment",
@@ -81,6 +81,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       ? "/inventory"
       : userRole === "STAFF"
       ? "/reservations"
+      : userRole === "CUSTOMER"
+      ? "/equipment"
       : "/dashboard";
 
   // Filter links based on user role

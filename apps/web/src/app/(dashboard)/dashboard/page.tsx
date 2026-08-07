@@ -84,6 +84,8 @@ export default function DashboardPage() {
       router.replace("/inventory");
     } else if (user?.role === "STAFF") {
       router.replace("/reservations");
+    } else if (user?.role === "CUSTOMER") {
+      router.replace("/equipment");
     }
   }, [user, router]);
 

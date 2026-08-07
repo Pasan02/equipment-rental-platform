@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
+import { FileUpload } from "@/components/ui/file-upload";
 import {
   Search,
   Plus,
@@ -28,7 +29,9 @@ import {
   Package,
   Clock,
   AlertCircle,
+  Upload,
   FileText,
+  Download,
   DollarSign,
 } from "lucide-react";
 
@@ -69,6 +72,13 @@ interface Reservation {
     lastName: string;
   };
   items?: ReservationItem[];
+  uploads?: Array<{
+    id: string;
+    type: string;
+    fileName: string;
+    fileUrl: string;
+    createdAt: string;
+  }>;
   _count?: {
     items: number;
   };
@@ -104,6 +114,7 @@ export default function ReservationsPage() {
 
   // Modal states
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [showDocUpload, setShowDocUpload] = useState(false);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [returningId, setReturningId] = useState<string | null>(null);
@@ -598,6 +609,62 @@ export default function ReservationsPage() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Attached Rental Documents Section */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-semibold text-slate-900">Rental Documents & Verification</h4>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-[11px] border-slate-300 text-blue-600 hover:bg-blue-50 gap-1 cursor-pointer"
+                  onClick={() => setShowDocUpload(!showDocUpload)}
+                >
+                  <Upload className="h-3.5 w-3.5" /> {showDocUpload ? "Hide Uploader" : "Upload Document"}
+                </Button>
+              </div>
+
+              {showDocUpload && (
+                <div className="mb-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                  <FileUpload
+                    type="RENTAL_AGREEMENT"
+                    reservationId={selectedReservation.id}
+                    label="Attach Rental Agreement or Verification Doc"
+                    onSuccess={() => {
+                      queryClient.invalidateQueries({ queryKey: ["reservations"] });
+                    }}
+                  />
+                </div>
+              )}
+
+              {selectedReservation.uploads && selectedReservation.uploads.length > 0 ? (
+                <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white overflow-hidden">
+                  {selectedReservation.uploads.map((doc: any) => (
+                    <div key={doc.id} className="p-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-slate-900">{doc.fileName}</p>
+                          <span className="text-[10px] text-slate-500">{doc.type}</span>
+                        </div>
+                      </div>
+                      <a
+                        href={doc.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-1"
+                      >
+                        <Download className="h-3.5 w-3.5" /> Download
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-400 italic text-[11px] p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                  No rental agreement or verification documents attached to this reservation yet.
+                </p>
+              )}
             </div>
 
             {/* Actions Toolbar in Modal */}

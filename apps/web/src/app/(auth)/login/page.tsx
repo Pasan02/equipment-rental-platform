@@ -60,6 +60,8 @@ function LoginForm() {
             ? "/inventory"
             : user.role === "STAFF"
             ? "/reservations"
+            : user.role === "CUSTOMER"
+            ? "/equipment"
             : redirect
           : redirect;
       router.push(targetPath);

@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store";
 import { apiClient } from "@/lib/api-client";
+import { formatDateTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { FileUpload } from "@/components/ui/file-upload";
 import {
   User,
   ShieldCheck,
@@ -22,14 +25,30 @@ import {
   Mail,
   Phone,
   Building,
+  FileText,
+  Download,
+  Trash2,
 } from "lucide-react";
 
+interface UploadRecord {
+  id: string;
+  type: string;
+  fileName: string;
+  fileUrl: string;
+  mimeType: string;
+  fileSize: number;
+  createdAt: string;
+}
+
 export default function SettingsPage() {
+  const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
   const updateUser = useAuthStore((state) => state.updateUser);
   const isAdmin = user?.role === "ADMIN";
 
-  const [activeTab, setActiveTab] = useState<"profile" | "security" | "system">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "security" | "documents" | "system">(
+    "profile"
+  );
 
   // Profile Form State
   const [profileForm, setProfileForm] = useState({
@@ -152,6 +171,33 @@ export default function SettingsPage() {
     }
   };
 
+  // Fetch User Uploaded Documents
+  const { data: rawUploads, isLoading: isLoadingUploads } = useQuery({
+    queryKey: ["uploads"],
+    queryFn: async () => {
+      const res = await apiClient.get("/uploads");
+      return res.data;
+    },
+  });
+
+  const userUploads: UploadRecord[] = Array.isArray(rawUploads?.data)
+    ? rawUploads.data
+    : Array.isArray(rawUploads)
+    ? rawUploads
+    : Array.isArray(rawUploads?.items)
+    ? rawUploads.items
+    : [];
+
+  // Delete Document Mutation
+  const deleteUploadMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiClient.delete(`/uploads/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["uploads"] });
+    },
+  });
+
   const initials = `${user?.firstName?.[0] || ""}${user?.lastName?.[0] || ""}`.toUpperCase() || "U";
 
   return (
@@ -188,6 +234,17 @@ export default function SettingsPage() {
           }`}
         >
           <ShieldCheck className="h-4 w-4" /> Security & Password
+        </button>
+
+        <button
+          onClick={() => setActiveTab("documents")}
+          className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer flex-shrink-0 ${
+            activeTab === "documents"
+              ? "bg-blue-600 text-white shadow-sm"
+              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          }`}
+        >
+          <FileText className="h-4 w-4" /> Identity Verification & Docs
         </button>
 
         {isAdmin && (
@@ -509,6 +566,99 @@ export default function SettingsPage() {
         </Card>
       )}
 
+      {/* TAB 4: Verification & Identity Documents */}
+      {activeTab === "documents" && (
+        <div className="space-y-6">
+          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-slate-900 font-heading">
+                Upload Verification Document
+              </CardTitle>
+              <CardDescription className="text-slate-500 text-xs">
+                Upload your Driver's License, Passport, or National ID for rental identity verification.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FileUpload
+                type="IDENTITY_DOCUMENT"
+                label="Select Identity File"
+                description="Upload PDF, PNG, JPG, or WEBP up to 10MB"
+                onSuccess={() => {
+                  queryClient.invalidateQueries({ queryKey: ["uploads"] });
+                }}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Uploaded Documents List */}
+          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-slate-900 font-heading">
+                Your Verification Documents ({userUploads.length})
+              </CardTitle>
+              <CardDescription className="text-slate-500 text-xs">
+                Manage your active verification files and attached documents.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoadingUploads ? (
+                <div className="py-8 text-center text-slate-400">
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" /> Loading verification documents...
+                </div>
+              ) : userUploads.length === 0 ? (
+                <div className="p-8 text-center text-slate-500 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                  <FileText className="h-8 w-8 text-slate-300 mx-auto mb-2 stroke-1" />
+                  <p className="text-xs font-semibold text-slate-700">No verification documents uploaded yet.</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Use the dropzone above to upload your Driver's License or ID.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white overflow-hidden">
+                  {userUploads.map((doc) => (
+                    <div key={doc.id} className="p-4 flex items-center justify-between hover:bg-slate-50/80 transition-colors text-xs">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
+                          <FileText className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-900">{doc.fileName}</p>
+                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
+                            <Badge variant="secondary" className="text-[10px]">
+                              {doc.type}
+                            </Badge>
+                            <span>{(doc.fileSize / (1024 * 1024)).toFixed(2)} MB</span>
+                            <span>• {formatDateTime(doc.createdAt)}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={doc.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-semibold px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors"
+                        >
+                          <Download className="h-3.5 w-3.5" /> View / Download
+                        </a>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg cursor-pointer"
+                          onClick={() => deleteUploadMutation.mutate(doc.id)}
+                          isLoading={deleteUploadMutation.isPending}
+                          title="Delete document"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
