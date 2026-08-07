@@ -3,7 +3,11 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { ReservationStatus, UserRole, ActivityAction } from '@equipment-rental/shared-types';
+import {
+  ReservationStatus,
+  UserRole,
+  ActivityAction,
+} from '@equipment-rental/shared-types';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 import { QueryEquipmentDto } from './dto/query-equipment.dto';
@@ -161,25 +165,26 @@ export class EquipmentService {
     const requestedQty = dto.quantity || 1;
 
     // Find overlapping reservation items with active, pending, or approved status
-    const overlappingReservationItems = await this.prisma.reservationItem.findMany({
-      where: {
-        equipmentId: id,
-        reservation: {
-          status: {
-            in: [
-              ReservationStatus.PENDING,
-              ReservationStatus.APPROVED,
-              ReservationStatus.ACTIVE,
-            ],
+    const overlappingReservationItems =
+      await this.prisma.reservationItem.findMany({
+        where: {
+          equipmentId: id,
+          reservation: {
+            status: {
+              in: [
+                ReservationStatus.PENDING,
+                ReservationStatus.APPROVED,
+                ReservationStatus.ACTIVE,
+              ],
+            },
+            pickupDate: { lte: end },
+            returnDate: { gte: start },
           },
-          pickupDate: { lte: end },
-          returnDate: { gte: start },
         },
-      },
-      select: {
-        quantity: true,
-      },
-    });
+        select: {
+          quantity: true,
+        },
+      });
 
     const totalReservedInPeriod = overlappingReservationItems.reduce(
       (sum, item) => sum + item.quantity,
@@ -210,7 +215,9 @@ export class EquipmentService {
     });
 
     if (!category) {
-      throw new NotFoundException(`Category with ID '${dto.categoryId}' not found`);
+      throw new NotFoundException(
+        `Category with ID '${dto.categoryId}' not found`,
+      );
     }
 
     const qrCode = this.generateQrCode(dto.name);
@@ -227,15 +234,16 @@ export class EquipmentService {
         specifications: dto.specifications ?? {},
         qrCode,
         categoryId: dto.categoryId,
-        images: dto.images && dto.images.length > 0
-          ? {
-              create: dto.images.map((img, idx) => ({
-                imageUrl: img.imageUrl,
-                isPrimary: img.isPrimary ?? idx === 0,
-                sortOrder: img.sortOrder ?? idx,
-              })),
-            }
-          : undefined,
+        images:
+          dto.images && dto.images.length > 0
+            ? {
+                create: dto.images.map((img, idx) => ({
+                  imageUrl: img.imageUrl,
+                  isPrimary: img.isPrimary ?? idx === 0,
+                  sortOrder: img.sortOrder ?? idx,
+                })),
+              }
+            : undefined,
       },
       include: {
         category: true,
@@ -250,7 +258,10 @@ export class EquipmentService {
         action: ActivityAction.EQUIPMENT_CREATED,
         entityType: 'EQUIPMENT',
         entityId: equipment.id,
-        newValues: { name: equipment.name, stockQuantity: equipment.stockQuantity },
+        newValues: {
+          name: equipment.name,
+          stockQuantity: equipment.stockQuantity,
+        },
       });
     }
 
@@ -268,7 +279,9 @@ export class EquipmentService {
         where: { id: dto.categoryId },
       });
       if (!category) {
-        throw new NotFoundException(`Category with ID '${dto.categoryId}' not found`);
+        throw new NotFoundException(
+          `Category with ID '${dto.categoryId}' not found`,
+        );
       }
     }
 
@@ -323,7 +336,10 @@ export class EquipmentService {
         action: ActivityAction.EQUIPMENT_UPDATED,
         entityType: 'EQUIPMENT',
         entityId: id,
-        oldValues: { name: existing.name, stockQuantity: existing.stockQuantity },
+        oldValues: {
+          name: existing.name,
+          stockQuantity: existing.stockQuantity,
+        },
         newValues: { name: updated.name, stockQuantity: updated.stockQuantity },
       });
     }

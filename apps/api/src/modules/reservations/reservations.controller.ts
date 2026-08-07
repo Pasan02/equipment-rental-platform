@@ -35,8 +35,14 @@ export class ReservationsController {
   @Post()
   @Roles(UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Create a new reservation (Customer)' })
-  @ApiResponse({ status: 201, description: 'Reservation created successfully with PENDING status.' })
-  @ApiResponse({ status: 400, description: 'Invalid date range, insufficient stock, or bad payload.' })
+  @ApiResponse({
+    status: 201,
+    description: 'Reservation created successfully with PENDING status.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid date range, insufficient stock, or bad payload.',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 404, description: 'Equipment not found.' })
   async create(
@@ -47,7 +53,9 @@ export class ReservationsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List reservations (Customer views own; Admin/Staff view all)' })
+  @ApiOperation({
+    summary: 'List reservations (Customer views own; Admin/Staff view all)',
+  })
   @ApiResponse({ status: 200, description: 'Paginated reservation list.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async findAll(
@@ -62,7 +70,11 @@ export class ReservationsController {
   @ApiParam({ name: 'id', description: 'Reservation UUID' })
   @ApiResponse({ status: 200, description: 'Reservation details.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 403, description: 'Forbidden (Customer cannot view other customers reservations).' })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden (Customer cannot view other customers reservations).',
+  })
   @ApiResponse({ status: 404, description: 'Reservation not found.' })
   async findOne(
     @Param('id') id: string,
@@ -75,10 +87,19 @@ export class ReservationsController {
   @Roles(UserRole.STAFF, UserRole.ADMIN)
   @ApiOperation({ summary: 'Approve a pending reservation (Staff / Admin)' })
   @ApiParam({ name: 'id', description: 'Reservation UUID' })
-  @ApiResponse({ status: 200, description: 'Reservation approved successfully. Stock decremented.' })
-  @ApiResponse({ status: 400, description: 'Invalid status transition (Not PENDING).' })
+  @ApiResponse({
+    status: 200,
+    description: 'Reservation approved successfully. Stock decremented.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid status transition (Not PENDING).',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 403, description: 'Forbidden (Staff/Admin role required).' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (Staff/Admin role required).',
+  })
   async approve(
     @Param('id') id: string,
     @Body() dto: ApproveReservationDto,
@@ -89,12 +110,23 @@ export class ReservationsController {
 
   @Patch(':id/reject')
   @Roles(UserRole.STAFF, UserRole.ADMIN)
-  @ApiOperation({ summary: 'Reject a pending reservation with reason (Staff / Admin)' })
+  @ApiOperation({
+    summary: 'Reject a pending reservation with reason (Staff / Admin)',
+  })
   @ApiParam({ name: 'id', description: 'Reservation UUID' })
-  @ApiResponse({ status: 200, description: 'Reservation rejected successfully.' })
-  @ApiResponse({ status: 400, description: 'Invalid status transition (Not PENDING) or missing reason.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Reservation rejected successfully.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid status transition (Not PENDING) or missing reason.',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 403, description: 'Forbidden (Staff/Admin role required).' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (Staff/Admin role required).',
+  })
   async reject(
     @Param('id') id: string,
     @Body() dto: RejectReservationDto,
@@ -105,16 +137,24 @@ export class ReservationsController {
 
   @Patch(':id/activate')
   @Roles(UserRole.STAFF, UserRole.ADMIN)
-  @ApiOperation({ summary: 'Mark reservation as active upon pickup (Staff / Admin)' })
+  @ApiOperation({
+    summary: 'Mark reservation as active upon pickup (Staff / Admin)',
+  })
   @ApiParam({ name: 'id', description: 'Reservation UUID' })
-  @ApiResponse({ status: 200, description: 'Reservation status changed to ACTIVE.' })
-  @ApiResponse({ status: 400, description: 'Invalid status transition (Not APPROVED).' })
+  @ApiResponse({
+    status: 200,
+    description: 'Reservation status changed to ACTIVE.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid status transition (Not APPROVED).',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 403, description: 'Forbidden (Staff/Admin role required).' })
-  async activate(
-    @Param('id') id: string,
-    @CurrentUser() user: { id: string },
-  ) {
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (Staff/Admin role required).',
+  })
+  async activate(@Param('id') id: string, @CurrentUser() user: { id: string }) {
     return this.reservationsService.activate(id, user.id);
   }
 
@@ -122,8 +162,14 @@ export class ReservationsController {
   @Roles(UserRole.STAFF, UserRole.ADMIN, UserRole.WAREHOUSE)
   @ApiOperation({ summary: 'Complete equipment return (Staff / Warehouse)' })
   @ApiParam({ name: 'id', description: 'Reservation UUID' })
-  @ApiResponse({ status: 200, description: 'Reservation returned. Stock restored and inventory logged.' })
-  @ApiResponse({ status: 400, description: 'Invalid status transition (Not ACTIVE).' })
+  @ApiResponse({
+    status: 200,
+    description: 'Reservation returned. Stock restored and inventory logged.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid status transition (Not ACTIVE).',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async return(
@@ -137,8 +183,15 @@ export class ReservationsController {
   @Patch(':id/cancel')
   @ApiOperation({ summary: 'Cancel a reservation (Customer for own / Admin)' })
   @ApiParam({ name: 'id', description: 'Reservation UUID' })
-  @ApiResponse({ status: 200, description: 'Reservation cancelled. Stock restored if previously approved.' })
-  @ApiResponse({ status: 400, description: 'Invalid status transition (Only PENDING/APPROVED).' })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Reservation cancelled. Stock restored if previously approved.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid status transition (Only PENDING/APPROVED).',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async cancel(

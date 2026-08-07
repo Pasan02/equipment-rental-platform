@@ -12,7 +12,9 @@ export class NotificationProcessor extends WorkerHost {
   }
 
   async process(job: Job<any, any, string>): Promise<any> {
-    this.logger.log(`Processing notification job "${job.name}" [ID: ${job.id}]`);
+    this.logger.log(
+      `Processing notification job "${job.name}" [ID: ${job.id}]`,
+    );
 
     switch (job.name) {
       case 'create-inapp-notification':
@@ -27,6 +29,6 @@ export class NotificationProcessor extends WorkerHost {
       default:
         this.logger.warn(`Unknown notification job type: ${job.name}`);
         return null;
-      }
+    }
   }
 }

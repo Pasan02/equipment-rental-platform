@@ -67,7 +67,9 @@ describe('AuthService', () => {
         user: { id: 'user-456', isActive: true, role: UserRole.CUSTOMER },
       };
 
-      mockPrismaService.refreshToken.findUnique.mockResolvedValue(revokedTokenRecord);
+      mockPrismaService.refreshToken.findUnique.mockResolvedValue(
+        revokedTokenRecord,
+      );
 
       await expect(
         service.refreshToken({ refreshToken: 'revoked-token-string' }),
@@ -91,7 +93,9 @@ describe('AuthService', () => {
 
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      const response = await service.forgotPassword({ email: 'test@example.com' });
+      const response = await service.forgotPassword({
+        email: 'test@example.com',
+      });
       expect(response).toEqual({
         message: 'If the email exists, a password reset link has been sent',
       });
@@ -108,7 +112,9 @@ describe('AuthService', () => {
         isRevoked: false,
       };
 
-      mockPrismaService.refreshToken.findUnique.mockResolvedValue(foreignTokenRecord);
+      mockPrismaService.refreshToken.findUnique.mockResolvedValue(
+        foreignTokenRecord,
+      );
 
       await expect(
         service.logout({ refreshToken: 'token-belonging-to-user-B' }, 'user-A'),
@@ -123,10 +129,18 @@ describe('AuthService', () => {
         isRevoked: false,
       };
 
-      mockPrismaService.refreshToken.findUnique.mockResolvedValue(ownTokenRecord);
-      mockPrismaService.refreshToken.update.mockResolvedValue({ ...ownTokenRecord, isRevoked: true });
+      mockPrismaService.refreshToken.findUnique.mockResolvedValue(
+        ownTokenRecord,
+      );
+      mockPrismaService.refreshToken.update.mockResolvedValue({
+        ...ownTokenRecord,
+        isRevoked: true,
+      });
 
-      const response = await service.logout({ refreshToken: 'token-belonging-to-user-A' }, 'user-A');
+      const response = await service.logout(
+        { refreshToken: 'token-belonging-to-user-A' },
+        'user-A',
+      );
       expect(response).toEqual({ message: 'Logged out successfully' });
       expect(mockPrismaService.refreshToken.update).toHaveBeenCalledWith({
         where: { id: 'token-user-A' },

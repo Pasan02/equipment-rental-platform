@@ -26,10 +26,13 @@ describe('HttpExceptionFilter', () => {
   });
 
   it('should map Prisma P2002 to 409 Conflict', () => {
-    const prismaError = new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
-      code: 'P2002',
-      clientVersion: '6.0.0',
-    });
+    const prismaError = new Prisma.PrismaClientKnownRequestError(
+      'Unique constraint failed',
+      {
+        code: 'P2002',
+        clientVersion: '6.0.0',
+      },
+    );
 
     filter.catch(prismaError, mockArgumentsHost);
 
@@ -47,10 +50,13 @@ describe('HttpExceptionFilter', () => {
   });
 
   it('should map Prisma P2025 to 404 Not Found', () => {
-    const prismaError = new Prisma.PrismaClientKnownRequestError('Record not found', {
-      code: 'P2025',
-      clientVersion: '6.0.0',
-    });
+    const prismaError = new Prisma.PrismaClientKnownRequestError(
+      'Record not found',
+      {
+        code: 'P2025',
+        clientVersion: '6.0.0',
+      },
+    );
 
     filter.catch(prismaError, mockArgumentsHost);
 
@@ -73,7 +79,9 @@ describe('HttpExceptionFilter', () => {
 
     filter.catch(genericError, mockArgumentsHost);
 
-    expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(mockResponse.status).toHaveBeenCalledWith(
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({
         error: expect.objectContaining({

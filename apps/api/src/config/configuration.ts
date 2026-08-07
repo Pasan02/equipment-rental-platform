@@ -15,7 +15,9 @@ export default () => ({
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
   },
   cors: {
-    origins: (process.env.CORS_ORIGINS || 'http://localhost:3000,http://localhost:3001').split(','),
+    origins: (
+      process.env.CORS_ORIGINS || 'http://localhost:3000,http://localhost:3001'
+    ).split(','),
   },
   storage: {
     endpoint: process.env.STORAGE_ENDPOINT,
@@ -32,4 +34,3 @@ export default () => ({
     from: process.env.SMTP_FROM,
   },
 });
-

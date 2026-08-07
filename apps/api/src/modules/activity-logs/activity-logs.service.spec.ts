@@ -61,13 +61,22 @@ describe('ActivityLogsService', () => {
         {
           id: 'log-1',
           action: ActivityAction.LOGIN,
-          user: { id: 'u-1', email: 'test@example.com', firstName: 'John', lastName: 'Doe' },
+          user: {
+            id: 'u-1',
+            email: 'test@example.com',
+            firstName: 'John',
+            lastName: 'Doe',
+          },
         },
       ];
       mockPrismaService.activityLog.findMany.mockResolvedValue(mockLogs);
       mockPrismaService.activityLog.count.mockResolvedValue(1);
 
-      const result = await service.findAll({ page: 1, pageSize: 10, action: ActivityAction.LOGIN });
+      const result = await service.findAll({
+        page: 1,
+        pageSize: 10,
+        action: ActivityAction.LOGIN,
+      });
 
       expect(result.data).toEqual(mockLogs);
       expect(result.meta.total).toBe(1);

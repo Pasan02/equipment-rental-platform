@@ -57,7 +57,9 @@ export class ActivityLogsService {
     const take = pageSize;
 
     const allowedSortFields = ['createdAt', 'action', 'entityType'];
-    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const safeSortBy = allowedSortFields.includes(sortBy)
+      ? sortBy
+      : 'createdAt';
 
     const where: any = {};
 

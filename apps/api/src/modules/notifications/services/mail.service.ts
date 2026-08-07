@@ -44,10 +44,15 @@ export class MailService {
           subject,
           html,
         });
-        this.logger.log(`Email successfully sent to ${to} [Subject: ${subject}]`);
+        this.logger.log(
+          `Email successfully sent to ${to} [Subject: ${subject}]`,
+        );
         return true;
       } catch (error) {
-        this.logger.error(`Failed to send email via SMTP to ${to}: ${error.message}`, error.stack);
+        this.logger.error(
+          `Failed to send email via SMTP to ${to}: ${error.message}`,
+          error.stack,
+        );
       }
     }
 

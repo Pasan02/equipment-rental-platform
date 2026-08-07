@@ -31,25 +31,33 @@ describe('RolesGuard', () => {
   });
 
   it('should allow access if required roles match user role', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.STAFF]);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([UserRole.STAFF]);
     const context = createMockContext(UserRole.STAFF);
     expect(guard.canActivate(context)).toBe(true);
   });
 
   it('should allow access for ADMIN role regardless of required roles (Admin Override)', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.WAREHOUSE]);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([UserRole.WAREHOUSE]);
     const context = createMockContext(UserRole.ADMIN);
     expect(guard.canActivate(context)).toBe(true);
   });
 
   it('should throw ForbiddenException if user role does not match required roles', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.ADMIN, UserRole.STAFF]);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([UserRole.ADMIN, UserRole.STAFF]);
     const context = createMockContext(UserRole.CUSTOMER);
     expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
   });
 
   it('should throw ForbiddenException if request has no authenticated user', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.CUSTOMER]);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([UserRole.CUSTOMER]);
     const context = createMockContext(undefined);
     expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
   });

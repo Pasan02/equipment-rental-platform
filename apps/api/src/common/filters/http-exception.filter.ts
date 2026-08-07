@@ -45,7 +45,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         }
       }
     } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
-      this.logger.error(`Prisma error [${exception.code}]: ${exception.message}`, exception.stack);
+      this.logger.error(
+        `Prisma error [${exception.code}]: ${exception.message}`,
+        exception.stack,
+      );
       switch (exception.code) {
         case 'P2002': // Unique constraint failed
           status = HttpStatus.CONFLICT;
@@ -68,11 +71,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
           message = 'A database error occurred';
       }
     } else if (exception instanceof Error) {
-      this.logger.error(`Unhandled exception: ${exception.message}`, exception.stack);
-      message = process.env.NODE_ENV === 'production' ? 'Internal server error' : exception.message;
+      this.logger.error(
+        `Unhandled exception: ${exception.message}`,
+        exception.stack,
+      );
+      message =
+        process.env.NODE_ENV === 'production'
+          ? 'Internal server error'
+          : exception.message;
     }
 
-    if (status === HttpStatus.NOT_FOUND && errorCode === 'INTERNAL_SERVER_ERROR') {
+    if (
+      status === HttpStatus.NOT_FOUND &&
+      errorCode === 'INTERNAL_SERVER_ERROR'
+    ) {
       errorCode = 'NOT_FOUND';
     } else if (status === HttpStatus.UNAUTHORIZED) {
       errorCode = 'UNAUTHORIZED';

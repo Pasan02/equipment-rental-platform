@@ -20,7 +20,9 @@ export const envValidationSchema = Joi.object({
   REDIS_PORT: Joi.number().default(6379),
 
   // CORS
-  CORS_ORIGINS: Joi.string().default('http://localhost:3000,http://localhost:3001'),
+  CORS_ORIGINS: Joi.string().default(
+    'http://localhost:3000,http://localhost:3001',
+  ),
 
   // Cloudflare R2 / AWS S3 (optional — required in Phase 4)
   STORAGE_ENDPOINT: Joi.string().optional(),
@@ -36,4 +38,3 @@ export const envValidationSchema = Joi.object({
   SMTP_PASS: Joi.string().optional(),
   SMTP_FROM: Joi.string().optional(),
 });
-

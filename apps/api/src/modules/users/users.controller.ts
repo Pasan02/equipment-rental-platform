@@ -10,7 +10,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -31,7 +36,9 @@ export class UsersController {
   @Get()
   @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'List all users with pagination & filters (ADMIN only)' })
+  @ApiOperation({
+    summary: 'List all users with pagination & filters (ADMIN only)',
+  })
   @ApiResponse({ status: 200, description: 'Paginated user list retrieved' })
   @ApiResponse({ status: 403, description: 'Forbidden: Admin access required' })
   async findAll(@Query() query: QueryUsersDto) {
@@ -42,7 +49,10 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get user details by ID (ADMIN or self)' })
   @ApiResponse({ status: 200, description: 'User details retrieved' })
-  @ApiResponse({ status: 403, description: 'Forbidden: You can only access your own profile' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden: You can only access your own profile',
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
@@ -55,7 +65,10 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update user profile or roles (ADMIN or self)' })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
-  @ApiResponse({ status: 403, description: 'Forbidden: Insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden: Insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -69,8 +82,14 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Change user password' })
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
-  @ApiResponse({ status: 400, description: 'Current password incorrect or validation error' })
-  @ApiResponse({ status: 403, description: 'Forbidden: You can only change your own password' })
+  @ApiResponse({
+    status: 400,
+    description: 'Current password incorrect or validation error',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden: You can only change your own password',
+  })
   async changePassword(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() changePasswordDto: ChangePasswordDto,

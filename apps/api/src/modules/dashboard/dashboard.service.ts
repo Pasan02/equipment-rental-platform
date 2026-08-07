@@ -19,7 +19,15 @@ export class DashboardService {
     // Start of current month & previous month
     const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const endOfPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+    const endOfPrevMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
 
     const [
       totalCustomers,
@@ -71,13 +79,20 @@ export class DashboardService {
     ]);
 
     const totalRevenue = Number(totalRevenueAggregate._sum.amount || 0);
-    const monthlyRevenue = Number(currentMonthRevenueAggregate._sum.amount || 0);
+    const monthlyRevenue = Number(
+      currentMonthRevenueAggregate._sum.amount || 0,
+    );
     const prevMonthRevenue = Number(prevMonthRevenueAggregate._sum.amount || 0);
 
     // Calculate revenue growth percentage
     let revenueGrowth = 0;
     if (prevMonthRevenue > 0) {
-      revenueGrowth = Number((((monthlyRevenue - prevMonthRevenue) / prevMonthRevenue) * 100).toFixed(1));
+      revenueGrowth = Number(
+        (
+          ((monthlyRevenue - prevMonthRevenue) / prevMonthRevenue) *
+          100
+        ).toFixed(1),
+      );
     } else if (monthlyRevenue > 0) {
       revenueGrowth = 100.0;
     }
@@ -88,7 +103,9 @@ export class DashboardService {
 
     const equipmentUtilization =
       totalStock > 0
-        ? Number((((totalStock - totalAvailable) / totalStock) * 100).toFixed(1))
+        ? Number(
+            (((totalStock - totalAvailable) / totalStock) * 100).toFixed(1),
+          )
         : 0;
 
     return {
@@ -130,7 +147,13 @@ export class DashboardService {
       where: {
         reservation: {
           createdAt: { gte: startDate },
-          status: { in: [ReservationStatus.APPROVED, ReservationStatus.ACTIVE, ReservationStatus.RETURNED] },
+          status: {
+            in: [
+              ReservationStatus.APPROVED,
+              ReservationStatus.ACTIVE,
+              ReservationStatus.RETURNED,
+            ],
+          },
         },
       },
       orderBy: {
@@ -148,7 +171,11 @@ export class DashboardService {
         where: { isActive: true },
         include: {
           category: { select: { name: true } },
-          images: { where: { isPrimary: true }, select: { imageUrl: true }, take: 1 },
+          images: {
+            where: { isPrimary: true },
+            select: { imageUrl: true },
+            take: 1,
+          },
         },
       });
 
@@ -167,7 +194,11 @@ export class DashboardService {
       where: { id: { in: equipmentIds } },
       include: {
         category: { select: { name: true } },
-        images: { where: { isPrimary: true }, select: { imageUrl: true }, take: 1 },
+        images: {
+          where: { isPrimary: true },
+          select: { imageUrl: true },
+          take: 1,
+        },
       },
     });
 
@@ -273,7 +304,10 @@ export class DashboardService {
   /**
    * Format date into bucket key based on period granularity
    */
-  private formatDateBucket(date: Date, period: 'daily' | 'weekly' | 'monthly'): string {
+  private formatDateBucket(
+    date: Date,
+    period: 'daily' | 'weekly' | 'monthly',
+  ): string {
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');

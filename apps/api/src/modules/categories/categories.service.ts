@@ -62,7 +62,9 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new NotFoundException(`Category with identifier '${idOrSlug}' not found`);
+      throw new NotFoundException(
+        `Category with identifier '${idOrSlug}' not found`,
+      );
     }
 
     return category;

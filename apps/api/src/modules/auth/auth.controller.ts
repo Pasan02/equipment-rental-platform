@@ -7,7 +7,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -54,7 +59,9 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Refresh an access token using a valid refresh token' })
+  @ApiOperation({
+    summary: 'Refresh an access token using a valid refresh token',
+  })
   @ApiResponse({ status: 200, description: 'Token refresh successful' })
   @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
@@ -88,7 +95,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout user and revoke refresh token' })
   @ApiResponse({ status: 200, description: 'Logout successful' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async logout(@Body() logoutDto: LogoutDto, @CurrentUser('id') userId?: string) {
+  async logout(
+    @Body() logoutDto: LogoutDto,
+    @CurrentUser('id') userId?: string,
+  ) {
     return this.authService.logout(logoutDto, userId);
   }
 }

@@ -36,7 +36,10 @@ export class InventoryController {
   @Get()
   @Roles(UserRole.WAREHOUSE, UserRole.ADMIN, UserRole.STAFF)
   @ApiOperation({ summary: 'Get stock overview for all equipment' })
-  @ApiResponse({ status: 200, description: 'Inventory stock overview retrieved' })
+  @ApiResponse({
+    status: 200,
+    description: 'Inventory stock overview retrieved',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden access' })
   async getStockOverview() {
@@ -57,47 +60,64 @@ export class InventoryController {
 
   @Post('receive')
   @Roles(UserRole.WAREHOUSE, UserRole.ADMIN)
-  @ApiOperation({ summary: 'Record equipment received (increases stock and available quantity)' })
-  @ApiResponse({ status: 201, description: 'Equipment received logged successfully' })
+  @ApiOperation({
+    summary:
+      'Record equipment received (increases stock and available quantity)',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Equipment received logged successfully',
+  })
   @ApiResponse({ status: 404, description: 'Equipment not found' })
-  async receive(
-    @Body() dto: ReceiveInventoryDto,
-    @CurrentUser() user: any,
-  ) {
+  async receive(@Body() dto: ReceiveInventoryDto, @CurrentUser() user: any) {
     return this.inventoryService.receive(dto, user.id);
   }
 
   @Post('release')
   @Roles(UserRole.WAREHOUSE, UserRole.ADMIN, UserRole.STAFF)
-  @ApiOperation({ summary: 'Record equipment released (decreases available quantity)' })
-  @ApiResponse({ status: 201, description: 'Equipment release logged successfully' })
+  @ApiOperation({
+    summary: 'Record equipment released (decreases available quantity)',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Equipment release logged successfully',
+  })
   @ApiResponse({ status: 400, description: 'Insufficient available quantity' })
   @ApiResponse({ status: 404, description: 'Equipment not found' })
-  async release(
-    @Body() dto: ReleaseInventoryDto,
-    @CurrentUser() user: any,
-  ) {
+  async release(@Body() dto: ReleaseInventoryDto, @CurrentUser() user: any) {
     return this.inventoryService.release(dto, user.id);
   }
 
   @Post('damage')
   @Roles(UserRole.WAREHOUSE, UserRole.ADMIN)
-  @ApiOperation({ summary: 'Record equipment damage (decreases total stock & available quantity)' })
-  @ApiResponse({ status: 201, description: 'Equipment damage logged successfully' })
-  @ApiResponse({ status: 400, description: 'Damage quantity exceeds total stock' })
+  @ApiOperation({
+    summary:
+      'Record equipment damage (decreases total stock & available quantity)',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Equipment damage logged successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Damage quantity exceeds total stock',
+  })
   @ApiResponse({ status: 404, description: 'Equipment not found' })
-  async damage(
-    @Body() dto: DamageInventoryDto,
-    @CurrentUser() user: any,
-  ) {
+  async damage(@Body() dto: DamageInventoryDto, @CurrentUser() user: any) {
     return this.inventoryService.damage(dto, user.id);
   }
 
   @Post('maintenance')
   @Roles(UserRole.WAREHOUSE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Record equipment sent to maintenance' })
-  @ApiResponse({ status: 201, description: 'Equipment maintenance logged successfully' })
-  @ApiResponse({ status: 400, description: 'Insufficient available stock for maintenance' })
+  @ApiResponse({
+    status: 201,
+    description: 'Equipment maintenance logged successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Insufficient available stock for maintenance',
+  })
   @ApiResponse({ status: 404, description: 'Equipment not found' })
   async maintenance(
     @Body() dto: MaintenanceInventoryDto,

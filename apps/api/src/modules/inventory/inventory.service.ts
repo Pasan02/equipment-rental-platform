@@ -5,7 +5,12 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { InventoryAction, ActivityAction, PaymentType, PaymentStatus } from '@prisma/client';
+import {
+  InventoryAction,
+  ActivityAction,
+  PaymentType,
+  PaymentStatus,
+} from '@prisma/client';
 import { ReceiveInventoryDto } from './dto/receive-inventory.dto';
 import { ReleaseInventoryDto } from './dto/release-inventory.dto';
 import { DamageInventoryDto } from './dto/damage-inventory.dto';
@@ -38,7 +43,10 @@ export class InventoryService {
     const items = equipmentList.map((item) => {
       totalStock += item.stockQuantity;
       totalAvailable += item.availableQuantity;
-      const reservedQuantity = Math.max(0, item.stockQuantity - item.availableQuantity);
+      const reservedQuantity = Math.max(
+        0,
+        item.stockQuantity - item.availableQuantity,
+      );
 
       return {
         id: item.id,
@@ -62,7 +70,9 @@ export class InventoryService {
         totalReservedQuantity: Math.max(0, totalStock - totalAvailable),
         utilizationRatePercent:
           totalStock > 0
-            ? Number((((totalStock - totalAvailable) / totalStock) * 100).toFixed(1))
+            ? Number(
+                (((totalStock - totalAvailable) / totalStock) * 100).toFixed(1),
+              )
             : 0,
       },
       items,
@@ -73,7 +83,14 @@ export class InventoryService {
    * View inventory log history for specific equipment or overall
    */
   async getHistory(equipmentId?: string, query: QueryInventoryLogsDto = {}) {
-    const { page = 1, pageSize = 10, sortBy = 'createdAt', sortOrder = 'desc', action, userId } = query;
+    const {
+      page = 1,
+      pageSize = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      action,
+      userId,
+    } = query;
     const skip = (page - 1) * pageSize;
 
     if (equipmentId) {
@@ -81,7 +98,9 @@ export class InventoryService {
         where: { id: equipmentId },
       });
       if (!equipment) {
-        throw new NotFoundException(`Equipment with ID "${equipmentId}" not found`);
+        throw new NotFoundException(
+          `Equipment with ID "${equipmentId}" not found`,
+        );
       }
     }
 
@@ -105,7 +124,12 @@ export class InventoryService {
         orderBy: { [sortBy]: sortOrder },
         include: {
           equipment: {
-            select: { id: true, name: true, stockQuantity: true, availableQuantity: true },
+            select: {
+              id: true,
+              name: true,
+              stockQuantity: true,
+              availableQuantity: true,
+            },
           },
           user: {
             select: { id: true, firstName: true, lastName: true, email: true },
@@ -136,7 +160,9 @@ export class InventoryService {
     });
 
     if (!equipment) {
-      throw new NotFoundException(`Equipment with ID "${dto.equipmentId}" not found`);
+      throw new NotFoundException(
+        `Equipment with ID "${dto.equipmentId}" not found`,
+      );
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -158,7 +184,12 @@ export class InventoryService {
         },
         include: {
           equipment: {
-            select: { id: true, name: true, stockQuantity: true, availableQuantity: true },
+            select: {
+              id: true,
+              name: true,
+              stockQuantity: true,
+              availableQuantity: true,
+            },
           },
           user: {
             select: { id: true, firstName: true, lastName: true, email: true },
@@ -172,8 +203,16 @@ export class InventoryService {
           action: ActivityAction.INVENTORY_CHANGE,
           entityType: 'equipment',
           entityId: dto.equipmentId,
-          oldValues: { stockQuantity: equipment.stockQuantity, availableQuantity: equipment.availableQuantity },
-          newValues: { stockQuantity: updatedEquipment.stockQuantity, availableQuantity: updatedEquipment.availableQuantity, action: 'RECEIVED', quantity: dto.quantity },
+          oldValues: {
+            stockQuantity: equipment.stockQuantity,
+            availableQuantity: equipment.availableQuantity,
+          },
+          newValues: {
+            stockQuantity: updatedEquipment.stockQuantity,
+            availableQuantity: updatedEquipment.availableQuantity,
+            action: 'RECEIVED',
+            quantity: dto.quantity,
+          },
         },
       });
 
@@ -195,7 +234,9 @@ export class InventoryService {
       });
 
       if (!equipment) {
-        throw new NotFoundException(`Equipment with ID "${dto.equipmentId}" not found`);
+        throw new NotFoundException(
+          `Equipment with ID "${dto.equipmentId}" not found`,
+        );
       }
 
       if (equipment.availableQuantity < dto.quantity) {
@@ -217,11 +258,21 @@ export class InventoryService {
           userId,
           action: InventoryAction.RELEASED,
           quantityChange: -dto.quantity,
-          notes: dto.notes || `Released ${dto.quantity} unit(s)` + (dto.reservationId ? ` for reservation ${dto.reservationId}` : ''),
+          notes:
+            dto.notes ||
+            `Released ${dto.quantity} unit(s)` +
+              (dto.reservationId
+                ? ` for reservation ${dto.reservationId}`
+                : ''),
         },
         include: {
           equipment: {
-            select: { id: true, name: true, stockQuantity: true, availableQuantity: true },
+            select: {
+              id: true,
+              name: true,
+              stockQuantity: true,
+              availableQuantity: true,
+            },
           },
           user: {
             select: { id: true, firstName: true, lastName: true, email: true },
@@ -236,7 +287,12 @@ export class InventoryService {
           entityType: 'equipment',
           entityId: dto.equipmentId,
           oldValues: { availableQuantity: equipment.availableQuantity },
-          newValues: { availableQuantity: updatedEquipment.availableQuantity, action: 'RELEASED', quantity: dto.quantity, reservationId: dto.reservationId },
+          newValues: {
+            availableQuantity: updatedEquipment.availableQuantity,
+            action: 'RELEASED',
+            quantity: dto.quantity,
+            reservationId: dto.reservationId,
+          },
         },
       });
 
@@ -257,7 +313,9 @@ export class InventoryService {
     });
 
     if (!equipment) {
-      throw new NotFoundException(`Equipment with ID "${dto.equipmentId}" not found`);
+      throw new NotFoundException(
+        `Equipment with ID "${dto.equipmentId}" not found`,
+      );
     }
 
     if (equipment.stockQuantity < dto.quantity) {
@@ -266,7 +324,10 @@ export class InventoryService {
       );
     }
 
-    const availableDecrement = Math.min(equipment.availableQuantity, dto.quantity);
+    const availableDecrement = Math.min(
+      equipment.availableQuantity,
+      dto.quantity,
+    );
 
     return this.prisma.$transaction(async (tx) => {
       const updatedEquipment = await tx.equipment.update({
@@ -287,7 +348,12 @@ export class InventoryService {
         },
         include: {
           equipment: {
-            select: { id: true, name: true, stockQuantity: true, availableQuantity: true },
+            select: {
+              id: true,
+              name: true,
+              stockQuantity: true,
+              availableQuantity: true,
+            },
           },
           user: {
             select: { id: true, firstName: true, lastName: true, email: true },
@@ -296,7 +362,12 @@ export class InventoryService {
       });
 
       let damagePaymentRecord: any = null;
-      if (dto.chargeDamageFee && dto.reservationId && dto.damageFeeAmount && dto.damageFeeAmount > 0) {
+      if (
+        dto.chargeDamageFee &&
+        dto.reservationId &&
+        dto.damageFeeAmount &&
+        dto.damageFeeAmount > 0
+      ) {
         const reservation = await tx.reservation.findUnique({
           where: { id: dto.reservationId },
         });
@@ -328,7 +399,10 @@ export class InventoryService {
           action: ActivityAction.INVENTORY_CHANGE,
           entityType: 'equipment',
           entityId: dto.equipmentId,
-          oldValues: { stockQuantity: equipment.stockQuantity, availableQuantity: equipment.availableQuantity },
+          oldValues: {
+            stockQuantity: equipment.stockQuantity,
+            availableQuantity: equipment.availableQuantity,
+          },
           newValues: {
             stockQuantity: updatedEquipment.stockQuantity,
             availableQuantity: updatedEquipment.availableQuantity,
@@ -358,7 +432,9 @@ export class InventoryService {
       });
 
       if (!equipment) {
-        throw new NotFoundException(`Equipment with ID "${dto.equipmentId}" not found`);
+        throw new NotFoundException(
+          `Equipment with ID "${dto.equipmentId}" not found`,
+        );
       }
 
       if (equipment.availableQuantity < dto.quantity) {
@@ -384,7 +460,12 @@ export class InventoryService {
         },
         include: {
           equipment: {
-            select: { id: true, name: true, stockQuantity: true, availableQuantity: true },
+            select: {
+              id: true,
+              name: true,
+              stockQuantity: true,
+              availableQuantity: true,
+            },
           },
           user: {
             select: { id: true, firstName: true, lastName: true, email: true },
@@ -399,7 +480,11 @@ export class InventoryService {
           entityType: 'equipment',
           entityId: dto.equipmentId,
           oldValues: { availableQuantity: equipment.availableQuantity },
-          newValues: { availableQuantity: updatedEquipment.availableQuantity, action: 'MAINTENANCE', quantity: dto.quantity },
+          newValues: {
+            availableQuantity: updatedEquipment.availableQuantity,
+            action: 'MAINTENANCE',
+            quantity: dto.quantity,
+          },
         },
       });
 

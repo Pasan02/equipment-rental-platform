@@ -40,7 +40,9 @@ export class UsersService {
       'role',
       'isActive',
     ];
-    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const safeSortBy = allowedSortFields.includes(sortBy)
+      ? sortBy
+      : 'createdAt';
 
     const where: any = {};
 
@@ -155,7 +157,9 @@ export class UsersService {
       currentUser.role !== UserRole.ADMIN &&
       (updateUserDto.role !== undefined || updateUserDto.isActive !== undefined)
     ) {
-      throw new ForbiddenException('Only administrators can modify user role or status');
+      throw new ForbiddenException(
+        'Only administrators can modify user role or status',
+      );
     }
 
     const updatedUser = await this.prisma.user.update({
@@ -202,13 +206,19 @@ export class UsersService {
       throw new NotFoundException(`User with ID '${id}' not found`);
     }
 
-    const isMatch = await bcrypt.compare(changePasswordDto.currentPassword, user.passwordHash);
+    const isMatch = await bcrypt.compare(
+      changePasswordDto.currentPassword,
+      user.passwordHash,
+    );
     if (!isMatch) {
       throw new BadRequestException('Current password is incorrect');
     }
 
     const saltRounds = 12;
-    const passwordHash = await bcrypt.hash(changePasswordDto.newPassword, saltRounds);
+    const passwordHash = await bcrypt.hash(
+      changePasswordDto.newPassword,
+      saltRounds,
+    );
 
     await this.prisma.user.update({
       where: { id },

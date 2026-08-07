@@ -56,7 +56,6 @@ export class ReservationsService {
   async create(dto: CreateReservationDto, customerId: string) {
     const pickup = new Date(dto.pickupDate);
     const returnD = new Date(dto.returnDate);
-    const now = new Date();
 
     if (isNaN(pickup.getTime()) || isNaN(returnD.getTime())) {
       throw new BadRequestException('Invalid pickupDate or returnDate format');
@@ -221,9 +220,19 @@ export class ReservationsService {
     if (query.search) {
       where.OR = [
         { reservationNumber: { contains: query.search, mode: 'insensitive' } },
-        { customer: { firstName: { contains: query.search, mode: 'insensitive' } } },
-        { customer: { lastName: { contains: query.search, mode: 'insensitive' } } },
-        { customer: { email: { contains: query.search, mode: 'insensitive' } } },
+        {
+          customer: {
+            firstName: { contains: query.search, mode: 'insensitive' },
+          },
+        },
+        {
+          customer: {
+            lastName: { contains: query.search, mode: 'insensitive' },
+          },
+        },
+        {
+          customer: { email: { contains: query.search, mode: 'insensitive' } },
+        },
       ];
     }
 
@@ -275,10 +284,7 @@ export class ReservationsService {
   /**
    * Get single reservation detail with ownership security enforcement.
    */
-  async findOne(
-    id: string,
-    currentUser?: { id: string; role: UserRole },
-  ) {
+  async findOne(id: string, currentUser?: { id: string; role: UserRole }) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
       include: {
@@ -318,7 +324,9 @@ export class ReservationsService {
       currentUser.role === UserRole.CUSTOMER &&
       reservation.customerId !== currentUser.id
     ) {
-      throw new ForbiddenException('You are not authorized to view this reservation');
+      throw new ForbiddenException(
+        'You are not authorized to view this reservation',
+      );
     }
 
     return reservation;
@@ -354,7 +362,9 @@ export class ReservationsService {
         data: {
           status: ReservationStatus.APPROVED,
           approvedBy: staffId,
-          notes: dto?.notes ? `${reservation.notes || ''}\n[Staff Note]: ${dto.notes}`.trim() : reservation.notes,
+          notes: dto?.notes
+            ? `${reservation.notes || ''}\n[Staff Note]: ${dto.notes}`.trim()
+            : reservation.notes,
         },
         include: {
           customer: true,
@@ -468,7 +478,9 @@ export class ReservationsService {
         data: {
           status: ReservationStatus.RETURNED,
           actualReturnDate: new Date(),
-          notes: dto?.notes ? `${reservation.notes || ''}\n[Return Note]: ${dto.notes}`.trim() : reservation.notes,
+          notes: dto?.notes
+            ? `${reservation.notes || ''}\n[Return Note]: ${dto.notes}`.trim()
+            : reservation.notes,
         },
         include: {
           customer: true,
@@ -515,10 +527,7 @@ export class ReservationsService {
   /**
    * Cancel a PENDING or APPROVED reservation (Customer own / Admin). Restores stock if approved.
    */
-  async cancel(
-    id: string,
-    currentUser: { id: string; role: UserRole },
-  ) {
+  async cancel(id: string, currentUser: { id: string; role: UserRole }) {
     const reservation = await this.findOne(id, currentUser);
 
     if (

@@ -34,7 +34,9 @@ async function bootstrap() {
   // Swagger Documentation Setup
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Equipment Rental Management Platform API')
-    .setDescription('RESTful API documentation for Equipment Rental Management System')
+    .setDescription(
+      'RESTful API documentation for Equipment Rental Management System',
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .addTag('Auth', 'Authentication & authorization endpoints')
@@ -56,6 +58,8 @@ async function bootstrap() {
   const port = configService.get<number>('port') || 3000;
   await app.listen(port);
   logger.log(`🚀 API Server running on http://localhost:${port}/api/v1`);
-  logger.log(`📚 Swagger documentation available at http://localhost:${port}/api/docs`);
+  logger.log(
+    `📚 Swagger documentation available at http://localhost:${port}/api/docs`,
+  );
 }
 bootstrap();

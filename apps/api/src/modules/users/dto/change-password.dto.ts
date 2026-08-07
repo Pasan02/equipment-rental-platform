@@ -9,7 +9,8 @@ export class ChangePasswordDto {
 
   @ApiProperty({
     example: 'NewSecureP@ss1',
-    description: 'New password (min 8 chars, uppercase, lowercase, number, special char)',
+    description:
+      'New password (min 8 chars, uppercase, lowercase, number, special char)',
   })
   @IsString()
   @IsNotEmpty({ message: 'New password is required' })

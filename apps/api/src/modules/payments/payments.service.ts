@@ -179,10 +179,7 @@ export class PaymentsService {
   /**
    * Get single payment detail with ownership security enforcement.
    */
-  async findOne(
-    id: string,
-    currentUser?: { id: string; role: UserRole },
-  ) {
+  async findOne(id: string, currentUser?: { id: string; role: UserRole }) {
     const payment = await this.prisma.payment.findUnique({
       where: { id },
       include: {
@@ -264,11 +261,7 @@ export class PaymentsService {
   /**
    * Refund a PAID payment (Admin). Creates new REFUND record and marks original as REFUNDED.
    */
-  async refund(
-    id: string,
-    dto?: RefundPaymentDto,
-    currentUserId?: string,
-  ) {
+  async refund(id: string, dto?: RefundPaymentDto, currentUserId?: string) {
     const originalPayment = await this.findOne(id);
 
     if (originalPayment.status !== PaymentStatus.PAID) {

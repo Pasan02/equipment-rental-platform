@@ -55,7 +55,9 @@ export class CreateReservationDto {
     description: 'List of equipment items and quantities to reserve',
   })
   @IsArray()
-  @ArrayMinSize(1, { message: 'At least one equipment item is required for reservation' })
+  @ArrayMinSize(1, {
+    message: 'At least one equipment item is required for reservation',
+  })
   @ValidateNested({ each: true })
   @Type(() => CreateReservationItemDto)
   items: CreateReservationItemDto[];

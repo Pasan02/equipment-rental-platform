@@ -1,4 +1,8 @@
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
@@ -37,7 +41,13 @@ describe('UsersService', () => {
   describe('findAll', () => {
     it('should return paginated user records with meta', async () => {
       const mockUsers = [
-        { id: '1', email: 'user1@test.com', firstName: 'A', lastName: 'B', role: UserRole.CUSTOMER },
+        {
+          id: '1',
+          email: 'user1@test.com',
+          firstName: 'A',
+          lastName: 'B',
+          role: UserRole.CUSTOMER,
+        },
       ];
       mockPrismaService.user.findMany.mockResolvedValue(mockUsers);
       mockPrismaService.user.count.mockResolvedValue(1);
@@ -51,10 +61,17 @@ describe('UsersService', () => {
 
   describe('findOne', () => {
     it('should return user details for self profile request', async () => {
-      const mockUser = { id: 'u1', email: 'u1@test.com', role: UserRole.CUSTOMER };
+      const mockUser = {
+        id: 'u1',
+        email: 'u1@test.com',
+        role: UserRole.CUSTOMER,
+      };
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      const result = await service.findOne('u1', { id: 'u1', role: UserRole.CUSTOMER });
+      const result = await service.findOne('u1', {
+        id: 'u1',
+        role: UserRole.CUSTOMER,
+      });
       expect(result).toEqual(mockUser);
     });
 
@@ -65,10 +82,17 @@ describe('UsersService', () => {
     });
 
     it('should allow ADMIN to view any user profile', async () => {
-      const mockUser = { id: 'u2', email: 'u2@test.com', role: UserRole.CUSTOMER };
+      const mockUser = {
+        id: 'u2',
+        email: 'u2@test.com',
+        role: UserRole.CUSTOMER,
+      };
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      const result = await service.findOne('u2', { id: 'admin1', role: UserRole.ADMIN });
+      const result = await service.findOne('u2', {
+        id: 'admin1',
+        role: UserRole.ADMIN,
+      });
       expect(result).toEqual(mockUser);
     });
 
@@ -84,7 +108,10 @@ describe('UsersService', () => {
     it('should allow self profile update for name and phone', async () => {
       const mockUser = { id: 'u1', firstName: 'John', lastName: 'Doe' };
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
-      mockPrismaService.user.update.mockResolvedValue({ ...mockUser, firstName: 'Johnny' });
+      mockPrismaService.user.update.mockResolvedValue({
+        ...mockUser,
+        firstName: 'Johnny',
+      });
 
       const result = await service.update(
         'u1',
@@ -110,7 +137,10 @@ describe('UsersService', () => {
   describe('changePassword', () => {
     it('should change password successfully when current password is correct', async () => {
       const hashedOldPassword = await bcrypt.hash('OldPassword1!', 10);
-      mockPrismaService.user.findUnique.mockResolvedValue({ id: 'u1', passwordHash: hashedOldPassword });
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: 'u1',
+        passwordHash: hashedOldPassword,
+      });
       mockPrismaService.user.update.mockResolvedValue({});
       mockPrismaService.refreshToken.updateMany.mockResolvedValue({});
 
@@ -130,7 +160,10 @@ describe('UsersService', () => {
 
     it('should throw BadRequestException if current password is incorrect', async () => {
       const hashedOldPassword = await bcrypt.hash('OldPassword1!', 10);
-      mockPrismaService.user.findUnique.mockResolvedValue({ id: 'u1', passwordHash: hashedOldPassword });
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: 'u1',
+        passwordHash: hashedOldPassword,
+      });
 
       await expect(
         service.changePassword(

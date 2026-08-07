@@ -76,9 +76,14 @@ describe('NotificationsService', () => {
   describe('findAll', () => {
     it('should return paginated list of notifications for user', async () => {
       mockPrismaService.notification.count.mockResolvedValue(1);
-      mockPrismaService.notification.findMany.mockResolvedValue([mockNotification]);
+      mockPrismaService.notification.findMany.mockResolvedValue([
+        mockNotification,
+      ]);
 
-      const result = await service.findAll('user-uuid-1', { page: 1, pageSize: 10 });
+      const result = await service.findAll('user-uuid-1', {
+        page: 1,
+        pageSize: 10,
+      });
 
       expect(result.items).toHaveLength(1);
       expect(result.total).toBe(1);
@@ -100,7 +105,9 @@ describe('NotificationsService', () => {
 
   describe('markAsRead', () => {
     it('should mark notification as read for owner', async () => {
-      mockPrismaService.notification.findUnique.mockResolvedValue(mockNotification);
+      mockPrismaService.notification.findUnique.mockResolvedValue(
+        mockNotification,
+      );
       mockPrismaService.notification.update.mockResolvedValue({
         ...mockNotification,
         isRead: true,
@@ -113,19 +120,21 @@ describe('NotificationsService', () => {
     });
 
     it('should throw ForbiddenException if user attempts to mark another user notification as read', async () => {
-      mockPrismaService.notification.findUnique.mockResolvedValue(mockNotification);
-
-      await expect(service.markAsRead('notif-uuid-1', 'user-uuid-other')).rejects.toThrow(
-        ForbiddenException,
+      mockPrismaService.notification.findUnique.mockResolvedValue(
+        mockNotification,
       );
+
+      await expect(
+        service.markAsRead('notif-uuid-1', 'user-uuid-other'),
+      ).rejects.toThrow(ForbiddenException);
     });
 
     it('should throw NotFoundException if notification does not exist', async () => {
       mockPrismaService.notification.findUnique.mockResolvedValue(null);
 
-      await expect(service.markAsRead('invalid-notif-id', 'user-uuid-1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.markAsRead('invalid-notif-id', 'user-uuid-1'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

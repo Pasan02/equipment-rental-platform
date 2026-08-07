@@ -44,7 +44,14 @@ export class NotificationsService {
    * List notifications for a specific user with pagination and filters
    */
   async findAll(userId: string, query: QueryNotificationsDto) {
-    const { page = 1, pageSize = 10, sortBy = 'createdAt', sortOrder = 'desc', isRead, type } = query;
+    const {
+      page = 1,
+      pageSize = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      isRead,
+      type,
+    } = query;
     const skip = (page - 1) * pageSize;
 
     const where: any = { userId };
@@ -105,7 +112,9 @@ export class NotificationsService {
     }
 
     if (notification.userId !== userId) {
-      throw new ForbiddenException('You do not have permission to modify this notification');
+      throw new ForbiddenException(
+        'You do not have permission to modify this notification',
+      );
     }
 
     const updated = await this.prisma.notification.update({

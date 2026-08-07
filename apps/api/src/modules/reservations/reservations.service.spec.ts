@@ -95,7 +95,9 @@ describe('ReservationsService', () => {
         availableQuantity: 5,
       });
       mockPrismaService.reservation.count.mockResolvedValue(0);
-      mockPrismaService.reservation.create.mockResolvedValue(mockCreatedReservation);
+      mockPrismaService.reservation.create.mockResolvedValue(
+        mockCreatedReservation,
+      );
 
       const result = await service.create(dto, 'cust-1');
 
@@ -161,7 +163,9 @@ describe('ReservationsService', () => {
         id: 'res-1',
         customerId: 'other-cust',
       };
-      mockPrismaService.reservation.findUnique.mockResolvedValue(mockReservation);
+      mockPrismaService.reservation.findUnique.mockResolvedValue(
+        mockReservation,
+      );
 
       await expect(
         service.findOne('res-1', { id: 'cust-1', role: UserRole.CUSTOMER }),
@@ -176,9 +180,14 @@ describe('ReservationsService', () => {
         status: ReservationStatus.PENDING,
         items: [{ equipmentId: 'eq-1', quantity: 2 }],
       };
-      const approvedRes = { ...mockReservation, status: ReservationStatus.APPROVED };
+      const approvedRes = {
+        ...mockReservation,
+        status: ReservationStatus.APPROVED,
+      };
 
-      mockPrismaService.reservation.findUnique.mockResolvedValue(mockReservation);
+      mockPrismaService.reservation.findUnique.mockResolvedValue(
+        mockReservation,
+      );
       mockPrismaService.reservation.update.mockResolvedValue(approvedRes);
 
       const result = await service.approve('res-1', 'staff-1');
@@ -214,7 +223,9 @@ describe('ReservationsService', () => {
         rejectionReason: 'ID invalid',
       };
 
-      mockPrismaService.reservation.findUnique.mockResolvedValue(mockReservation);
+      mockPrismaService.reservation.findUnique.mockResolvedValue(
+        mockReservation,
+      );
       mockPrismaService.reservation.update.mockResolvedValue(rejectedRes);
 
       const result = await service.reject('res-1', 'staff-1', {
@@ -231,9 +242,14 @@ describe('ReservationsService', () => {
         id: 'res-1',
         status: ReservationStatus.APPROVED,
       };
-      const activeRes = { ...mockReservation, status: ReservationStatus.ACTIVE };
+      const activeRes = {
+        ...mockReservation,
+        status: ReservationStatus.ACTIVE,
+      };
 
-      mockPrismaService.reservation.findUnique.mockResolvedValue(mockReservation);
+      mockPrismaService.reservation.findUnique.mockResolvedValue(
+        mockReservation,
+      );
       mockPrismaService.reservation.update.mockResolvedValue(activeRes);
 
       const result = await service.activate('res-1', 'staff-1');
@@ -250,9 +266,14 @@ describe('ReservationsService', () => {
         status: ReservationStatus.ACTIVE,
         items: [{ equipmentId: 'eq-1', quantity: 2 }],
       };
-      const returnedRes = { ...mockReservation, status: ReservationStatus.RETURNED };
+      const returnedRes = {
+        ...mockReservation,
+        status: ReservationStatus.RETURNED,
+      };
 
-      mockPrismaService.reservation.findUnique.mockResolvedValue(mockReservation);
+      mockPrismaService.reservation.findUnique.mockResolvedValue(
+        mockReservation,
+      );
       mockPrismaService.reservation.update.mockResolvedValue(returnedRes);
 
       const result = await service.return('res-1', 'staff-1');
@@ -280,9 +301,14 @@ describe('ReservationsService', () => {
         status: ReservationStatus.APPROVED,
         items: [{ equipmentId: 'eq-1', quantity: 2 }],
       };
-      const cancelledRes = { ...mockReservation, status: ReservationStatus.CANCELLED };
+      const cancelledRes = {
+        ...mockReservation,
+        status: ReservationStatus.CANCELLED,
+      };
 
-      mockPrismaService.reservation.findUnique.mockResolvedValue(mockReservation);
+      mockPrismaService.reservation.findUnique.mockResolvedValue(
+        mockReservation,
+      );
       mockPrismaService.reservation.update.mockResolvedValue(cancelledRes);
 
       const result = await service.cancel('res-1', {

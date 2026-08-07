@@ -23,29 +23,51 @@ export class DashboardController {
   @Get('stats')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get aggregated overview statistics (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Overview statistics retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Overview statistics retrieved successfully',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden action (Admin access required)' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden action (Admin access required)',
+  })
   async getStats() {
     return this.dashboardService.getStats();
   }
 
   @Get('most-rented')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get most rented equipment list by time period (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Top rented equipment list retrieved successfully' })
+  @ApiOperation({
+    summary: 'Get most rented equipment list by time period (Admin only)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Top rented equipment list retrieved successfully',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden action (Admin access required)' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden action (Admin access required)',
+  })
   async getMostRented(@Query() query: QueryMostRentedDto) {
     return this.dashboardService.getMostRented(query);
   }
 
   @Get('reservation-trends')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get time-series reservation trends by status (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Reservation trends time-series data retrieved' })
+  @ApiOperation({
+    summary: 'Get time-series reservation trends by status (Admin only)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Reservation trends time-series data retrieved',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden action (Admin access required)' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden action (Admin access required)',
+  })
   async getReservationTrends(@Query() query: QueryReservationTrendsDto) {
     return this.dashboardService.getReservationTrends(query);
   }

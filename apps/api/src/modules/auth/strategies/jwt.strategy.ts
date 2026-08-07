@@ -21,7 +21,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('jwt.secret') || 'super-secret-jwt-key',
+      secretOrKey:
+        configService.get<string>('jwt.secret') || 'super-secret-jwt-key',
     });
   }
 
@@ -39,7 +40,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
 
     if (!user || !user.isActive) {
-      throw new UnauthorizedException('User is not authorized or account is inactive');
+      throw new UnauthorizedException(
+        'User is not authorized or account is inactive',
+      );
     }
 
     return user;

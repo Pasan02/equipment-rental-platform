@@ -33,10 +33,16 @@ export class PaymentsController {
   @Post()
   @Roles(UserRole.CUSTOMER, UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a new mock payment record' })
-  @ApiResponse({ status: 201, description: 'Payment record created with PENDING status.' })
+  @ApiResponse({
+    status: 201,
+    description: 'Payment record created with PENDING status.',
+  })
   @ApiResponse({ status: 400, description: 'Invalid payload.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 403, description: 'Forbidden (Cannot pay for another user reservation).' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (Cannot pay for another user reservation).',
+  })
   @ApiResponse({ status: 404, description: 'Reservation not found.' })
   async create(
     @Body() createPaymentDto: CreatePaymentDto,
@@ -46,7 +52,9 @@ export class PaymentsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List payments (Customer views own; Admin/Staff view all)' })
+  @ApiOperation({
+    summary: 'List payments (Customer views own; Admin/Staff view all)',
+  })
   @ApiResponse({ status: 200, description: 'Paginated payment list.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async findAll(
@@ -61,7 +69,11 @@ export class PaymentsController {
   @ApiParam({ name: 'id', description: 'Payment UUID' })
   @ApiResponse({ status: 200, description: 'Payment details.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 403, description: 'Forbidden (Customer cannot view other users payment records).' })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden (Customer cannot view other users payment records).',
+  })
   @ApiResponse({ status: 404, description: 'Payment record not found.' })
   async findOne(
     @Param('id') id: string,
@@ -75,7 +87,10 @@ export class PaymentsController {
   @ApiOperation({ summary: 'Process / mock approve payment (Admin only)' })
   @ApiParam({ name: 'id', description: 'Payment UUID' })
   @ApiResponse({ status: 200, description: 'Payment status changed to PAID.' })
-  @ApiResponse({ status: 400, description: 'Only PENDING payments can be processed.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Only PENDING payments can be processed.',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden (Admin role required).' })
   @ApiResponse({ status: 404, description: 'Payment record not found.' })
@@ -91,8 +106,15 @@ export class PaymentsController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Refund a paid payment (Admin only)' })
   @ApiParam({ name: 'id', description: 'Original Payment UUID' })
-  @ApiResponse({ status: 201, description: 'Refund record created and original status updated to REFUNDED.' })
-  @ApiResponse({ status: 400, description: 'Only PAID payments can be refunded.' })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Refund record created and original status updated to REFUNDED.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Only PAID payments can be refunded.',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden (Admin role required).' })
   @ApiResponse({ status: 404, description: 'Payment record not found.' })

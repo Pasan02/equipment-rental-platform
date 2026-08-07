@@ -1,7 +1,4 @@
-import {
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserRole } from '@equipment-rental/shared-types';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -172,7 +169,9 @@ describe('EquipmentService', () => {
         qrCode: 'EQP-DJIMAV-123456',
       };
 
-      mockPrismaService.category.findUnique.mockResolvedValue({ id: 'cat-drone' });
+      mockPrismaService.category.findUnique.mockResolvedValue({
+        id: 'cat-drone',
+      });
       mockPrismaService.equipment.create.mockResolvedValue(createdItem);
 
       const result = await service.create(dto, 'admin-1');

@@ -87,7 +87,10 @@ describe('InventoryService', () => {
         },
       ]);
 
-      const result = await service.getHistory(mockEquipment.id, { page: 1, pageSize: 10 });
+      const result = await service.getHistory(mockEquipment.id, {
+        page: 1,
+        pageSize: 10,
+      });
 
       expect(result.items).toHaveLength(1);
       expect(result.total).toBe(1);
@@ -96,7 +99,9 @@ describe('InventoryService', () => {
     it('should throw NotFoundException if specified equipment does not exist', async () => {
       mockPrismaService.equipment.findUnique.mockResolvedValue(null);
 
-      await expect(service.getHistory('invalid-eq-id')).rejects.toThrow(NotFoundException);
+      await expect(service.getHistory('invalid-eq-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -115,7 +120,11 @@ describe('InventoryService', () => {
       });
 
       const result = await service.receive(
-        { equipmentId: mockEquipment.id, quantity: 5, notes: 'Supplier delivery' },
+        {
+          equipmentId: mockEquipment.id,
+          quantity: 5,
+          notes: 'Supplier delivery',
+        },
         'user-uuid-1',
       );
 
@@ -134,7 +143,10 @@ describe('InventoryService', () => {
       mockPrismaService.equipment.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.receive({ equipmentId: 'invalid-eq-id', quantity: 5 }, 'user-uuid-1'),
+        service.receive(
+          { equipmentId: 'invalid-eq-id', quantity: 5 },
+          'user-uuid-1',
+        ),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -164,7 +176,10 @@ describe('InventoryService', () => {
       mockPrismaService.equipment.findUnique.mockResolvedValue(mockEquipment); // availableQuantity = 5
 
       await expect(
-        service.release({ equipmentId: mockEquipment.id, quantity: 10 }, 'user-uuid-1'),
+        service.release(
+          { equipmentId: mockEquipment.id, quantity: 10 },
+          'user-uuid-1',
+        ),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -193,13 +208,18 @@ describe('InventoryService', () => {
 
     it('should optionally create damage fee payment if requested', async () => {
       mockPrismaService.equipment.findUnique.mockResolvedValue(mockEquipment);
-      mockPrismaService.reservation.findUnique.mockResolvedValue({ id: 'res-uuid-1' });
+      mockPrismaService.reservation.findUnique.mockResolvedValue({
+        id: 'res-uuid-1',
+      });
       mockPrismaService.equipment.update.mockResolvedValue({
         ...mockEquipment,
         stockQuantity: 9,
         availableQuantity: 4,
       });
-      mockPrismaService.payment.create.mockResolvedValue({ id: 'pay-uuid-1', amount: 150 });
+      mockPrismaService.payment.create.mockResolvedValue({
+        id: 'pay-uuid-1',
+        amount: 150,
+      });
 
       const result = await service.damage(
         {
@@ -220,7 +240,10 @@ describe('InventoryService', () => {
       mockPrismaService.equipment.findUnique.mockResolvedValue(mockEquipment); // stockQuantity = 10
 
       await expect(
-        service.damage({ equipmentId: mockEquipment.id, quantity: 20 }, 'user-uuid-1'),
+        service.damage(
+          { equipmentId: mockEquipment.id, quantity: 20 },
+          'user-uuid-1',
+        ),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -252,7 +275,10 @@ describe('InventoryService', () => {
       mockPrismaService.equipment.findUnique.mockResolvedValue(mockEquipment); // availableQuantity = 5
 
       await expect(
-        service.maintenance({ equipmentId: mockEquipment.id, quantity: 8 }, 'user-uuid-1'),
+        service.maintenance(
+          { equipmentId: mockEquipment.id, quantity: 8 },
+          'user-uuid-1',
+        ),
       ).rejects.toThrow(BadRequestException);
     });
   });

@@ -71,7 +71,9 @@ describe('PaymentsService', () => {
         status: PaymentStatus.PENDING,
       };
 
-      mockPrismaService.reservation.findUnique.mockResolvedValue(mockReservation);
+      mockPrismaService.reservation.findUnique.mockResolvedValue(
+        mockReservation,
+      );
       mockPrismaService.payment.create.mockResolvedValue(mockPayment);
 
       const result = await service.create(dto, {
@@ -212,7 +214,11 @@ describe('PaymentsService', () => {
       });
       mockPrismaService.payment.create.mockResolvedValue(refundRecord);
 
-      const result = await service.refund('pay-1', { reason: 'Cancellation' }, 'admin-1');
+      const result = await service.refund(
+        'pay-1',
+        { reason: 'Cancellation' },
+        'admin-1',
+      );
 
       expect(result).toEqual(refundRecord);
       expect(mockPrismaService.payment.update).toHaveBeenCalledWith({

@@ -36,7 +36,9 @@ export class ScheduledJobsService {
     while (true) {
       const reservations = await this.prisma.reservation.findMany({
         where: {
-          status: { in: [ReservationStatus.APPROVED, ReservationStatus.ACTIVE] },
+          status: {
+            in: [ReservationStatus.APPROVED, ReservationStatus.ACTIVE],
+          },
           returnDate: {
             gte: tomorrowStart,
             lte: tomorrowEnd,
@@ -52,7 +54,9 @@ export class ScheduledJobsService {
       if (reservations.length === 0) break;
 
       for (const reservation of reservations) {
-        const returnDateStr = reservation.returnDate.toISOString().split('T')[0];
+        const returnDateStr = reservation.returnDate
+          .toISOString()
+          .split('T')[0];
         const title = 'Upcoming Equipment Return';
         const message = `Your rental equipment for reservation ${reservation.reservationNumber} is due for return tomorrow (${returnDateStr}).`;
 
@@ -62,16 +66,22 @@ export class ScheduledJobsService {
           title,
           message,
           NotificationType.UPCOMING_RETURN,
-          { reservationId: reservation.id, reservationNumber: reservation.reservationNumber },
+          {
+            reservationId: reservation.id,
+            reservationNumber: reservation.reservationNumber,
+          },
         );
 
         // 2. Send email
         if (reservation.customer?.email) {
-          await this.mailService.sendUpcomingReturnEmail(reservation.customer.email, {
-            customerName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
-            reservationNumber: reservation.reservationNumber,
-            returnDate: returnDateStr,
-          });
+          await this.mailService.sendUpcomingReturnEmail(
+            reservation.customer.email,
+            {
+              customerName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
+              reservationNumber: reservation.reservationNumber,
+              returnDate: returnDateStr,
+            },
+          );
         }
       }
 
@@ -80,7 +90,9 @@ export class ScheduledJobsService {
       skip += BATCH_SIZE;
     }
 
-    this.logger.log(`Completed Upcoming Return Reminders: Processed ${totalProcessed} reservation(s)`);
+    this.logger.log(
+      `Completed Upcoming Return Reminders: Processed ${totalProcessed} reservation(s)`,
+    );
     return { processedCount: totalProcessed };
   }
 
@@ -121,7 +133,8 @@ export class ScheduledJobsService {
           },
           data: {
             status: ReservationStatus.CANCELLED,
-            rejectionReason: 'Auto-cancelled: Expired after 48 hours without approval',
+            rejectionReason:
+              'Auto-cancelled: Expired after 48 hours without approval',
           },
         });
 
@@ -136,15 +149,21 @@ export class ScheduledJobsService {
             title,
             message,
             NotificationType.RESERVATION_EXPIRED,
-            { reservationId: reservation.id, reservationNumber: reservation.reservationNumber },
+            {
+              reservationId: reservation.id,
+              reservationNumber: reservation.reservationNumber,
+            },
           );
 
           // 2. Send email
           if (reservation.customer?.email) {
-            await this.mailService.sendReservationExpiredEmail(reservation.customer.email, {
-              customerName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
-              reservationNumber: reservation.reservationNumber,
-            });
+            await this.mailService.sendReservationExpiredEmail(
+              reservation.customer.email,
+              {
+                customerName: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
+                reservationNumber: reservation.reservationNumber,
+              },
+            );
           }
         }
       }
@@ -153,7 +172,9 @@ export class ScheduledJobsService {
       if (expiredReservations.length < BATCH_SIZE) break;
     }
 
-    this.logger.log(`Completed Expired Reservations Task: Processed ${totalProcessed} reservation(s)`);
+    this.logger.log(
+      `Completed Expired Reservations Task: Processed ${totalProcessed} reservation(s)`,
+    );
     return { processedCount: totalProcessed };
   }
 }

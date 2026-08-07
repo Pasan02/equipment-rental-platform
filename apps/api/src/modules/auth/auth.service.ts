@@ -3,7 +3,6 @@ import {
   ForbiddenException,
   Injectable,
   Logger,
-  NotFoundException,
   UnauthorizedException,
   BadRequestException,
 } from '@nestjs/common';
@@ -58,7 +57,12 @@ export class AuthService {
         },
       });
     } catch (error) {
-      if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        error.code === 'P2002'
+      ) {
         throw new ConflictException('Email is already registered');
       }
       throw error;
@@ -102,7 +106,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
     }
@@ -190,7 +197,8 @@ export class AuthService {
     });
 
     if (user && user.isActive) {
-      const resetSecret = this.configService.get<string>('jwt.secret') + user.passwordHash;
+      const resetSecret =
+        this.configService.get<string>('jwt.secret') + user.passwordHash;
       const resetToken = this.jwtService.sign(
         { sub: user.id, email: user.email, type: 'password_reset' },
         { secret: resetSecret, expiresIn: '1h' },
@@ -215,7 +223,9 @@ export class AuthService {
       // Decode unverified token to find user ID first
       const decoded: any = this.jwtService.decode(resetPasswordDto.token);
       if (!decoded || !decoded.sub || decoded.type !== 'password_reset') {
-        throw new BadRequestException('Invalid or expired password reset token');
+        throw new BadRequestException(
+          'Invalid or expired password reset token',
+        );
       }
 
       const user = await this.prisma.user.findUnique({
@@ -223,17 +233,25 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new BadRequestException('Invalid or expired password reset token');
+        throw new BadRequestException(
+          'Invalid or expired password reset token',
+        );
       }
 
-      const resetSecret = this.configService.get<string>('jwt.secret') + user.passwordHash;
-      payload = this.jwtService.verify(resetPasswordDto.token, { secret: resetSecret });
+      const resetSecret =
+        this.configService.get<string>('jwt.secret') + user.passwordHash;
+      payload = this.jwtService.verify(resetPasswordDto.token, {
+        secret: resetSecret,
+      });
     } catch (error) {
       throw new BadRequestException('Invalid or expired password reset token');
     }
 
     const saltRounds = 12;
-    const passwordHash = await bcrypt.hash(resetPasswordDto.newPassword, saltRounds);
+    const passwordHash = await bcrypt.hash(
+      resetPasswordDto.newPassword,
+      saltRounds,
+    );
 
     await this.prisma.user.update({
       where: { id: payload.sub },
@@ -261,7 +279,9 @@ export class AuthService {
 
     if (tokenRecord) {
       if (userId && tokenRecord.userId !== userId) {
-        throw new ForbiddenException('You can only revoke your own refresh token');
+        throw new ForbiddenException(
+          'You can only revoke your own refresh token',
+        );
       }
 
       await this.prisma.refreshToken.update({
@@ -298,7 +318,8 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('jwt.secret'),
-      expiresIn: (this.configService.get<string>('jwt.accessExpiration') || '15m') as any,
+      expiresIn: (this.configService.get<string>('jwt.accessExpiration') ||
+        '15m') as any,
     });
 
     const refreshTokenString = crypto.randomBytes(40).toString('hex');

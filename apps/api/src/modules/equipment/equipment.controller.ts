@@ -32,7 +32,9 @@ export class EquipmentController {
 
   @Public()
   @Get()
-  @ApiOperation({ summary: 'List equipment with search, filters, and pagination (Public)' })
+  @ApiOperation({
+    summary: 'List equipment with search, filters, and pagination (Public)',
+  })
   @ApiResponse({ status: 200, description: 'Paginated equipment list.' })
   async findAll(
     @Query() query: QueryEquipmentDto,
@@ -53,9 +55,14 @@ export class EquipmentController {
 
   @Public()
   @Get(':id/availability')
-  @ApiOperation({ summary: 'Check equipment availability for date range (Public)' })
+  @ApiOperation({
+    summary: 'Check equipment availability for date range (Public)',
+  })
   @ApiParam({ name: 'id', description: 'Equipment UUID' })
-  @ApiResponse({ status: 200, description: 'Availability calculation results.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Availability calculation results.',
+  })
   @ApiResponse({ status: 400, description: 'Invalid date parameters.' })
   @ApiResponse({ status: 404, description: 'Equipment not found.' })
   async checkAvailability(
@@ -73,7 +80,10 @@ export class EquipmentController {
   @ApiResponse({ status: 201, description: 'Equipment created successfully.' })
   @ApiResponse({ status: 400, description: 'Invalid payload.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 403, description: 'Forbidden (Admin/Staff required).' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (Admin/Staff required).',
+  })
   @ApiResponse({ status: 404, description: 'Category not found.' })
   async create(
     @Body() createEquipmentDto: CreateEquipmentDto,
@@ -91,7 +101,10 @@ export class EquipmentController {
   @ApiResponse({ status: 200, description: 'Equipment updated successfully.' })
   @ApiResponse({ status: 400, description: 'Invalid payload.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 403, description: 'Forbidden (Admin/Staff required).' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (Admin/Staff required).',
+  })
   @ApiResponse({ status: 404, description: 'Equipment or Category not found.' })
   async update(
     @Param('id') id: string,
@@ -107,7 +120,10 @@ export class EquipmentController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Soft delete / deactivate equipment (Admin only)' })
   @ApiParam({ name: 'id', description: 'Equipment UUID' })
-  @ApiResponse({ status: 200, description: 'Equipment deactivated successfully.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Equipment deactivated successfully.',
+  })
   @ApiResponse({
     status: 400,
     description: 'Cannot deactivate equipment with active reservations.',
@@ -115,10 +131,7 @@ export class EquipmentController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden (Admin role required).' })
   @ApiResponse({ status: 404, description: 'Equipment not found.' })
-  async remove(
-    @Param('id') id: string,
-    @CurrentUser() user: { id: string },
-  ) {
+  async remove(@Param('id') id: string, @CurrentUser() user: { id: string }) {
     return this.equipmentService.remove(id, user.id);
   }
 }

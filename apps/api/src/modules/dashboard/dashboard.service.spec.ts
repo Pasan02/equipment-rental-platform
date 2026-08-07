@@ -49,8 +49,10 @@ describe('DashboardService', () => {
     it('should return aggregated dashboard statistics', async () => {
       mockPrismaService.user.count.mockResolvedValue(150);
       mockPrismaService.reservation.count.mockImplementation(({ where }) => {
-        if (where?.status === ReservationStatus.ACTIVE) return Promise.resolve(23);
-        if (where?.status === ReservationStatus.PENDING) return Promise.resolve(8);
+        if (where?.status === ReservationStatus.ACTIVE)
+          return Promise.resolve(23);
+        if (where?.status === ReservationStatus.PENDING)
+          return Promise.resolve(8);
         return Promise.resolve(0);
       });
       mockPrismaService.equipment.count.mockResolvedValue(85);
@@ -89,7 +91,10 @@ describe('DashboardService', () => {
         },
       ]);
 
-      const result = await service.getMostRented({ limit: 10, period: 'month' });
+      const result = await service.getMostRented({
+        limit: 10,
+        period: 'month',
+      });
 
       expect(result).toHaveLength(1);
       expect(result[0].equipmentName).toBe('Canon EOS R5');
