@@ -129,8 +129,9 @@ export default function EquipmentPage() {
       if (statusFilter === "inactive") params.append("isActive", "false");
 
       const res = await apiClient.get(`/equipment?${params.toString()}`);
-      return res.data.data as {
-        items: EquipmentItem[];
+      return res.data as {
+        success: boolean;
+        data: EquipmentItem[];
         meta: {
           total: number;
           page: number;
@@ -307,7 +308,11 @@ export default function EquipmentPage() {
     }
   };
 
-  const items: EquipmentItem[] = (equipmentData as any)?.data || equipmentData?.items || [];
+  const items: EquipmentItem[] = Array.isArray(equipmentData?.data)
+    ? equipmentData.data
+    : Array.isArray(equipmentData)
+    ? (equipmentData as EquipmentItem[])
+    : [];
   const meta = equipmentData?.meta;
 
   return (
