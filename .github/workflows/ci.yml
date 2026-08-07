@@ -1,0 +1,37 @@
+name: CI Workflow (Lint, Test & Build)
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches-ignore: [ main, master ]
+
+jobs:
+  lint-and-test:
+    name: Lint, Typecheck & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Monorepo Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate --schema=apps/api/prisma/schema.prisma
+
+      - name: Lint Monorepo
+        run: npm run lint
+
+      - name: Typecheck & Build Monorepo
+        run: npm run build
+
+      - name: Run API Unit Tests
+        run: npm run test --workspace=api -- --passWithNoTests
