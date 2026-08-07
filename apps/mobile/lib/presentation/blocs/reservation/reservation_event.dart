@@ -42,3 +42,42 @@ class ReservationCancelRequested extends ReservationEvent {
   @override
   List<Object?> get props => [reservationId];
 }
+
+class ReservationApproveRequested extends ReservationEvent {
+  final String reservationId;
+  final String? notes;
+
+  const ReservationApproveRequested(this.reservationId, {this.notes});
+
+  @override
+  List<Object?> get props => [reservationId, notes];
+}
+
+class ReservationRejectRequested extends ReservationEvent {
+  final String reservationId;
+  final String reason;
+
+  const ReservationRejectRequested(this.reservationId, {required this.reason});
+
+  @override
+  List<Object?> get props => [reservationId, reason];
+}
+
+class ReservationActivateRequested extends ReservationEvent {
+  final String reservationId;
+
+  const ReservationActivateRequested(this.reservationId);
+
+  @override
+  List<Object?> get props => [reservationId];
+}
+
+class ReservationReturnRequested extends ReservationEvent {
+  final String reservationId;
+  final String? notes;
+
+  const ReservationReturnRequested(this.reservationId, {this.notes});
+
+  @override
+  List<Object?> get props => [reservationId, notes];
+}

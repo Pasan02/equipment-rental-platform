@@ -208,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icons.fact_check_outlined,
                         color: AppColors.statusPending,
                         onTap: () {
-                          // Handled in Subtask 6.3
+                          context.push('/staff/pending');
                         },
                       ),
                       _buildFeatureCard(
@@ -218,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icons.qr_code_scanner,
                         color: AppColors.statusReturned,
                         onTap: () {
-                          // Handled in Subtask 6.3
+                          context.push('/staff/scan');
                         },
                       ),
                     ],

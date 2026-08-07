@@ -74,4 +74,41 @@ class ReservationRemoteDatasource {
     final data = response.data['data'] ?? response.data;
     return ReservationModel.fromJson(data);
   }
+
+  // Approve reservation (Staff/Admin)
+  Future<ReservationModel> approveReservation(String id, {String? notes}) async {
+    final response = await dioClient.dio.patch(
+      '/reservations/$id/approve',
+      data: notes != null && notes.isNotEmpty ? {'notes': notes} : {},
+    );
+    final data = response.data['data'] ?? response.data;
+    return ReservationModel.fromJson(data);
+  }
+
+  // Reject reservation (Staff/Admin)
+  Future<ReservationModel> rejectReservation(String id, {required String reason}) async {
+    final response = await dioClient.dio.patch(
+      '/reservations/$id/reject',
+      data: {'reason': reason},
+    );
+    final data = response.data['data'] ?? response.data;
+    return ReservationModel.fromJson(data);
+  }
+
+  // Activate pickup (Staff/Admin)
+  Future<ReservationModel> activateReservation(String id) async {
+    final response = await dioClient.dio.patch('/reservations/$id/activate');
+    final data = response.data['data'] ?? response.data;
+    return ReservationModel.fromJson(data);
+  }
+
+  // Process return (Staff/Warehouse/Admin)
+  Future<ReservationModel> returnReservation(String id, {String? notes}) async {
+    final response = await dioClient.dio.patch(
+      '/reservations/$id/return',
+      data: notes != null && notes.isNotEmpty ? {'notes': notes} : {},
+    );
+    final data = response.data['data'] ?? response.data;
+    return ReservationModel.fromJson(data);
+  }
 }

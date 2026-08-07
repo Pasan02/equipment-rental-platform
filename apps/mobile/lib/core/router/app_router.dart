@@ -11,6 +11,9 @@ import '../../presentation/screens/reservation/create_reservation_screen.dart';
 import '../../presentation/screens/reservation/reservation_detail_screen.dart';
 import '../../presentation/screens/reservation/reservations_list_screen.dart';
 import '../../presentation/screens/splash_screen.dart';
+import '../../presentation/screens/staff/qr_scanner_screen.dart';
+import '../../presentation/screens/staff/staff_pending_screen.dart';
+import '../../presentation/screens/staff/staff_reservation_detail_screen.dart';
 
 class AppRouter {
   final AuthBloc authBloc;
@@ -86,6 +89,21 @@ class AppRouter {
       GoRoute(
         path: '/notifications',
         builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/staff/pending',
+        builder: (context, state) => const StaffPendingScreen(),
+      ),
+      GoRoute(
+        path: '/staff/reservation/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return StaffReservationDetailScreen(reservationId: id);
+        },
+      ),
+      GoRoute(
+        path: '/staff/scan',
+        builder: (context, state) => const QrScannerScreen(),
       ),
     ],
   );

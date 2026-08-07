@@ -11,6 +11,10 @@ class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
     on<ReservationFetchRequested>(_onReservationFetchRequested);
     on<ReservationCreateRequested>(_onReservationCreateRequested);
     on<ReservationCancelRequested>(_onReservationCancelRequested);
+    on<ReservationApproveRequested>(_onReservationApproveRequested);
+    on<ReservationRejectRequested>(_onReservationRejectRequested);
+    on<ReservationActivateRequested>(_onReservationActivateRequested);
+    on<ReservationReturnRequested>(_onReservationReturnRequested);
   }
 
   Future<void> _onReservationFetchRequested(
@@ -69,6 +73,58 @@ class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
       add(const ReservationFetchRequested());
     } catch (e) {
       emit(ReservationFailure(message: 'Failed to cancel reservation: $e'));
+    }
+  }
+
+  Future<void> _onReservationApproveRequested(
+    ReservationApproveRequested event,
+    Emitter<ReservationState> emit,
+  ) async {
+    try {
+      await datasource.approveReservation(event.reservationId, notes: event.notes);
+      emit(const ReservationActionSuccess(message: 'Reservation approved successfully'));
+      add(const ReservationFetchRequested());
+    } catch (e) {
+      emit(ReservationFailure(message: 'Failed to approve reservation: $e'));
+    }
+  }
+
+  Future<void> _onReservationRejectRequested(
+    ReservationRejectRequested event,
+    Emitter<ReservationState> emit,
+  ) async {
+    try {
+      await datasource.rejectReservation(event.reservationId, reason: event.reason);
+      emit(const ReservationActionSuccess(message: 'Reservation rejected successfully'));
+      add(const ReservationFetchRequested());
+    } catch (e) {
+      emit(ReservationFailure(message: 'Failed to reject reservation: $e'));
+    }
+  }
+
+  Future<void> _onReservationActivateRequested(
+    ReservationActivateRequested event,
+    Emitter<ReservationState> emit,
+  ) async {
+    try {
+      await datasource.activateReservation(event.reservationId);
+      emit(const ReservationActionSuccess(message: 'Pickup activated successfully'));
+      add(const ReservationFetchRequested());
+    } catch (e) {
+      emit(ReservationFailure(message: 'Failed to activate pickup: $e'));
+    }
+  }
+
+  Future<void> _onReservationReturnRequested(
+    ReservationReturnRequested event,
+    Emitter<ReservationState> emit,
+  ) async {
+    try {
+      await datasource.returnReservation(event.reservationId, notes: event.notes);
+      emit(const ReservationActionSuccess(message: 'Return processed successfully'));
+      add(const ReservationFetchRequested());
+    } catch (e) {
+      emit(ReservationFailure(message: 'Failed to process return: $e'));
     }
   }
 }
