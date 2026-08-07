@@ -82,7 +82,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
               valueListenable: _controller,
               builder: (context, state, child) {
                 return Icon(
-                  state.cameraDirection == CameraDirection.front
+                  state.cameraDirection == CameraFacing.front
                       ? Icons.camera_front
                       : Icons.camera_rear,
                 );
