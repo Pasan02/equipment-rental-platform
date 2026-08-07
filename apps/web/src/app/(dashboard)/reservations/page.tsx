@@ -87,8 +87,11 @@ export default function ReservationsPage() {
   const user = useAuthStore((state) => state.user);
   const isStaffOrAdmin = user?.role === "ADMIN" || user?.role === "STAFF";
   const isWarehouse = user?.role === "WAREHOUSE";
+  const isCustomer = user?.role === "CUSTOMER";
+  const isAdmin = user?.role === "ADMIN";
   const canApprove = isStaffOrAdmin;
   const canReturn = isStaffOrAdmin || isWarehouse;
+  const canCancel = isCustomer || isAdmin;
 
   // Filter state
   const [search, setSearch] = useState("");
@@ -313,12 +316,14 @@ export default function ReservationsPage() {
             Track, approve, activate, and manage equipment reservations.
           </p>
         </div>
-        <Button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/25 gap-2 cursor-pointer"
-        >
-          <Plus className="h-4 w-4" /> New Reservation
-        </Button>
+        {!isWarehouse && (
+          <Button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/25 gap-2 cursor-pointer"
+          >
+            <Plus className="h-4 w-4" /> New Reservation
+          </Button>
+        )}
       </div>
 
       {/* Status Filter Tabs */}
@@ -637,7 +642,7 @@ export default function ReservationsPage() {
                 </Button>
               )}
 
-              {(selectedReservation.status === "PENDING" || selectedReservation.status === "APPROVED") && (
+              {(selectedReservation.status === "PENDING" || selectedReservation.status === "APPROVED") && canCancel && (
                 <Button
                   size="sm"
                   variant="outline"

@@ -54,7 +54,11 @@ function LoginForm() {
       const { user, accessToken, refreshToken } = response.data.data;
 
       setAuth(user, accessToken, refreshToken);
-      router.push(redirect);
+      const targetPath =
+        user.role === "WAREHOUSE" && (redirect === "/dashboard" || !redirect)
+          ? "/inventory"
+          : redirect;
+      router.push(targetPath);
     } catch (err: any) {
       const message =
         err.response?.data?.error?.message ||

@@ -68,28 +68,31 @@ export default function SettingsPage() {
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setProfileMessage(null);
+    if (!user?.id) return;
     setIsUpdatingProfile(true);
 
     try {
-      const res = await apiClient.put("/auth/profile", {
+      const res = await apiClient.patch(`/users/${user.id}`, {
         firstName: profileForm.firstName,
         lastName: profileForm.lastName,
         phone: profileForm.phone,
       });
 
-      if (res.data.data) {
-        updateUser({
-          ...user!,
-          firstName: profileForm.firstName,
-          lastName: profileForm.lastName,
-          phone: profileForm.phone,
-        });
-      }
+      const updatedData = res.data?.data || res.data;
+      updateUser({
+        ...user,
+        firstName: updatedData.firstName || profileForm.firstName,
+        lastName: updatedData.lastName || profileForm.lastName,
+        phone: updatedData.phone || profileForm.phone,
+      });
 
       setProfileMessage({ type: "success", text: "Profile information updated successfully." });
     } catch (err: any) {
-      const msg = err.response?.data?.error?.message || "Failed to update profile.";
-      setProfileMessage({ type: "error", text: msg });
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        "Failed to update profile.";
+      setProfileMessage({ type: "error", text: Array.isArray(msg) ? msg.join(", ") : msg });
     } finally {
       setIsUpdatingProfile(false);
     }
@@ -99,6 +102,7 @@ export default function SettingsPage() {
   const handleSecuritySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSecurityMessage(null);
+    if (!user?.id) return;
 
     if (securityForm.newPassword !== securityForm.confirmPassword) {
       setSecurityMessage({ type: "error", text: "New passwords do not match." });
@@ -113,7 +117,7 @@ export default function SettingsPage() {
     setIsUpdatingPassword(true);
 
     try {
-      await apiClient.post("/auth/change-password", {
+      await apiClient.patch(`/users/${user.id}/change-password`, {
         currentPassword: securityForm.currentPassword,
         newPassword: securityForm.newPassword,
       });
@@ -121,8 +125,11 @@ export default function SettingsPage() {
       setSecurityMessage({ type: "success", text: "Password changed successfully." });
       setSecurityForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err: any) {
-      const msg = err.response?.data?.error?.message || "Failed to change password.";
-      setSecurityMessage({ type: "error", text: msg });
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        "Failed to change password.";
+      setSecurityMessage({ type: "error", text: Array.isArray(msg) ? msg.join(", ") : msg });
     } finally {
       setIsUpdatingPassword(false);
     }

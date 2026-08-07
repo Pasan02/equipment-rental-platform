@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useAuthStore } from "@/stores/auth.store";
 import { apiClient } from "@/lib/api-client";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -74,6 +76,15 @@ interface ActivityLogItem {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    if (user?.role === "WAREHOUSE") {
+      router.replace("/inventory");
+    }
+  }, [user, router]);
+
   const [trendPeriod, setTrendPeriod] = useState<"daily" | "weekly" | "monthly">("daily");
   const [rentedPeriod, setRentedPeriod] = useState<"week" | "month" | "quarter">("month");
 

@@ -96,7 +96,9 @@ export default function InventoryPage() {
   });
   const [actionError, setActionError] = useState<string | null>(null);
 
-  // History Pagination
+  // Main Stock Overview & History Pagination
+  const [stockPage, setStockPage] = useState(1);
+  const stockPageSize = 8;
   const [historyPage, setHistoryPage] = useState(1);
 
   // Fetch Inventory Stock Overview
@@ -184,6 +186,13 @@ export default function InventoryPage() {
         catName.toLowerCase().includes(search.toLowerCase())
       );
     });
+
+  const totalStockItems = stockItems.length;
+  const totalStockPages = Math.ceil(totalStockItems / stockPageSize) || 1;
+  const paginatedStockItems = stockItems.slice(
+    (stockPage - 1) * stockPageSize,
+    stockPage * stockPageSize
+  );
 
   const openModal = (type: "RECEIVE" | "RELEASE" | "DAMAGE" | "MAINTENANCE") => {
     setActionForm({
@@ -428,7 +437,7 @@ export default function InventoryPage() {
                   </td>
                 </tr>
               ) : (
-                stockItems.map((item) => (
+                paginatedStockItems.map((item) => (
                   <tr key={item.equipmentId} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-4 px-4 font-semibold text-slate-900">
                       <div className="flex items-center gap-2">
@@ -456,7 +465,7 @@ export default function InventoryPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-xs text-slate-600 hover:text-slate-900"
+                        className="text-xs text-slate-600 hover:text-slate-900 cursor-pointer"
                         onClick={() => {
                           setHistoryEquipment({ id: item.equipmentId, name: item.name });
                           setHistoryPage(1);
@@ -471,6 +480,35 @@ export default function InventoryPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Main Stock Table Pagination Bar */}
+        {totalStockPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 bg-slate-50 text-xs text-slate-600">
+            <div>
+              Page {stockPage} of {totalStockPages} ({totalStockItems} items)
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={stockPage <= 1}
+                onClick={() => setStockPage(stockPage - 1)}
+                className="h-8 border-slate-300 bg-white text-slate-600 cursor-pointer"
+              >
+                <ChevronLeft className="h-3.5 w-3.5 mr-1" /> Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={stockPage >= totalStockPages}
+                onClick={() => setStockPage(stockPage + 1)}
+                className="h-8 border-slate-300 bg-white text-slate-600 cursor-pointer"
+              >
+                Next <ChevronRight className="h-3.5 w-3.5 ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Warehouse Operation Modal (Receive / Release / Damage / Maintenance) */}

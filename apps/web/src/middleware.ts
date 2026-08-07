@@ -33,11 +33,17 @@ export function middleware(request: NextRequest) {
   // 2. Authenticated user attempting to access login/register (allow if reason param present e.g. session expired)
   const reason = request.nextUrl.searchParams.get("reason");
   if (isAuthRoute && authToken && !reason) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const defaultHome = userRole === "WAREHOUSE" ? "/inventory" : "/dashboard";
+    return NextResponse.redirect(new URL(defaultHome, request.url));
   }
 
   // 3. Role-based path restrictions
   if (authToken && userRole) {
+    // Warehouse users redirected to /inventory if attempting to access /dashboard
+    if (pathname.startsWith("/dashboard") && userRole === "WAREHOUSE") {
+      return NextResponse.redirect(new URL("/inventory", request.url));
+    }
+
     // Customers route restricted to ADMIN only
     if (pathname.startsWith("/customers") && userRole !== "ADMIN") {
       return NextResponse.redirect(new URL("/dashboard", request.url));
