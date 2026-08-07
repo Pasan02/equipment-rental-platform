@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
@@ -15,6 +16,12 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, description, children, maxWidth = "md" }: ModalProps) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -31,7 +38,7 @@ export function Modal({ isOpen, onClose, title, description, children, maxWidth 
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const maxWidthClasses = {
     sm: "max-w-sm",
@@ -41,11 +48,14 @@ export function Modal({ isOpen, onClose, title, description, children, maxWidth 
     "2xl": "max-w-2xl",
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/40 backdrop-blur-sm p-4 animate-fade-in">
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-slate-900/60 backdrop-blur-md p-4 animate-fade-in"
+      onClick={onClose}
+    >
       <div
         className={cn(
-          "relative w-full rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 text-slate-900 transition-all transform scale-100",
+          "relative w-full rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 text-slate-900 transition-all transform scale-100 my-auto",
           maxWidthClasses[maxWidth]
         )}
         onClick={(e) => e.stopPropagation()}
@@ -55,7 +65,12 @@ export function Modal({ isOpen, onClose, title, description, children, maxWidth 
             <h2 className="text-lg font-bold font-heading text-slate-900">{title}</h2>
             {description ? <p className="mt-1 text-xs text-slate-500">{description}</p> : null}
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100" onClick={onClose}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+            onClick={onClose}
+          >
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </Button>
@@ -64,5 +79,7 @@ export function Modal({ isOpen, onClose, title, description, children, maxWidth 
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
 

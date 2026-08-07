@@ -27,12 +27,18 @@ import {
   AlertCircle,
   X,
   CheckCircle2,
+  FolderPlus,
 } from "lucide-react";
 
 interface Category {
   id: string;
   name: string;
   slug: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  _count?: {
+    equipment: number;
+  };
 }
 
 interface EquipmentImage {
@@ -106,13 +112,137 @@ export default function EquipmentPage() {
   }, [search]);
 
   // Fetch Categories
-  const { data: categories = [] } = useQuery({
+  const { data: rawCategories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const res = await apiClient.get("/categories");
-      return res.data.data as Category[];
+      return res.data;
     },
   });
+
+  const categories: Category[] = Array.isArray(rawCategories?.data)
+    ? rawCategories.data
+    : Array.isArray(rawCategories)
+    ? rawCategories
+    : [];
+
+  // Category Management Modal State
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryForm, setCategoryForm] = useState({
+    name: "",
+    description: "",
+    imageUrl: "",
+  });
+  const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [categorySuccess, setCategorySuccess] = useState<string | null>(null);
+
+  // Category Mutations
+  const createCategoryMutation = useMutation({
+    mutationFn: async (payload: { name: string; description?: string; imageUrl?: string }) => {
+      return apiClient.post("/categories", payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      setCategorySuccess("Category created successfully.");
+      setCategoryForm({ name: "", description: "", imageUrl: "" });
+      setCategoryError(null);
+    },
+    onError: (err: any) => {
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        "Failed to create category.";
+      setCategoryError(Array.isArray(msg) ? msg.join(", ") : msg);
+    },
+  });
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: async ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: { name: string; description?: string; imageUrl?: string };
+    }) => {
+      return apiClient.put(`/categories/${id}`, payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["equipment"] });
+      setCategorySuccess("Category updated successfully.");
+      setCategoryForm({ name: "", description: "", imageUrl: "" });
+      setEditingCategory(null);
+      setCategoryError(null);
+    },
+    onError: (err: any) => {
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        "Failed to update category.";
+      setCategoryError(Array.isArray(msg) ? msg.join(", ") : msg);
+    },
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiClient.delete(`/categories/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["equipment"] });
+      setCategorySuccess("Category deleted successfully.");
+      setCategoryError(null);
+    },
+    onError: (err: any) => {
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        "Cannot delete category.";
+      setCategoryError(Array.isArray(msg) ? msg.join(", ") : msg);
+    },
+  });
+
+  const handleCategorySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCategoryError(null);
+    setCategorySuccess(null);
+
+    if (!categoryForm.name.trim()) {
+      setCategoryError("Category name is required.");
+      return;
+    }
+
+    const payload = {
+      name: categoryForm.name.trim(),
+      description: categoryForm.description.trim() || undefined,
+      imageUrl: categoryForm.imageUrl.trim() || undefined,
+    };
+
+    if (editingCategory) {
+      updateCategoryMutation.mutate({ id: editingCategory.id, payload });
+    } else {
+      createCategoryMutation.mutate(payload);
+    }
+  };
+
+  const startEditCategory = (cat: Category) => {
+    setEditingCategory(cat);
+    setCategoryForm({
+      name: cat.name || "",
+      description: cat.description || "",
+      imageUrl: cat.imageUrl || "",
+    });
+    setCategoryError(null);
+    setCategorySuccess(null);
+  };
+
+  const cancelCategoryEdit = () => {
+    setEditingCategory(null);
+    setCategoryForm({ name: "", description: "", imageUrl: "" });
+    setCategoryError(null);
+    setCategorySuccess(null);
+  };
 
   // Fetch Equipment List
   const { data: equipmentData, isLoading } = useQuery({
@@ -327,14 +457,25 @@ export default function EquipmentPage() {
             Browse, manage inventory, and configure rental equipment.
           </p>
         </div>
-        {canManage && (
-          <Button
-            onClick={openCreateModal}
-            className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/25 gap-2 cursor-pointer"
-          >
-            <Plus className="h-4 w-4" /> Add Equipment
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Button
+              variant="outline"
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="border-slate-300 bg-white text-slate-700 hover:bg-slate-50 gap-2 cursor-pointer shadow-xs"
+            >
+              <FolderPlus className="h-4 w-4 text-blue-600" /> Manage Categories
+            </Button>
+          )}
+          {canManage && (
+            <Button
+              onClick={openCreateModal}
+              className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/25 gap-2 cursor-pointer"
+            >
+              <Plus className="h-4 w-4" /> Add Equipment
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Success Notification Banner */}
@@ -748,6 +889,142 @@ export default function EquipmentPage() {
           >
             Delete
           </Button>
+        </div>
+      </Modal>
+
+      {/* Category Management Modal (ADMIN Only) */}
+      <Modal
+        isOpen={isCategoryModalOpen}
+        onClose={() => {
+          setIsCategoryModalOpen(false);
+          cancelCategoryEdit();
+        }}
+        title="Equipment Category Management"
+        description="Add, edit, or remove equipment categories for rental gear organization."
+        maxWidth="xl"
+      >
+        <div className="space-y-6 text-xs">
+          {/* Alerts */}
+          {categoryError && (
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-medium">
+              {categoryError}
+            </div>
+          )}
+          {categorySuccess && (
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-medium">
+              {categorySuccess}
+            </div>
+          )}
+
+          {/* Add / Edit Category Form */}
+          <form onSubmit={handleCategorySubmit} className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <h4 className="font-bold text-slate-900 text-sm">
+              {editingCategory ? `Edit Category: ${editingCategory.name}` : "Create New Category"}
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-slate-700 font-medium mb-1">Category Name *</label>
+                <Input
+                  value={categoryForm.name}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+                  placeholder="e.g. Audio & Sound"
+                  required
+                  className="bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium mb-1">Image URL (Optional)</label>
+                <Input
+                  value={categoryForm.imageUrl}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, imageUrl: e.target.value })}
+                  placeholder="https://images.unsplash.com/..."
+                  className="bg-white"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-slate-700 font-medium mb-1">Description (Optional)</label>
+              <textarea
+                value={categoryForm.description}
+                onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+                placeholder="Brief summary of gear in this category..."
+                rows={2}
+                className="w-full rounded-xl border border-slate-300 bg-white p-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              {editingCategory && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={cancelCategoryEdit}
+                >
+                  Cancel Edit
+                </Button>
+              )}
+              <Button
+                type="submit"
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-500 text-white"
+                isLoading={createCategoryMutation.isPending || updateCategoryMutation.isPending}
+              >
+                {editingCategory ? "Update Category" : "Add Category"}
+              </Button>
+            </div>
+          </form>
+
+          {/* Categories List */}
+          <div>
+            <h4 className="font-bold text-slate-900 text-xs mb-2">Existing Categories ({categories.length})</h4>
+            <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white overflow-hidden max-h-60 overflow-y-auto">
+              {categories.length === 0 ? (
+                <div className="p-4 text-center text-slate-500">No categories found.</div>
+              ) : (
+                categories.map((cat) => (
+                  <div key={cat.id} className="p-3 flex items-center justify-between hover:bg-slate-50">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-slate-900 text-xs">{cat.name}</span>
+                        <Badge variant="secondary" className="text-[10px]">
+                          {cat._count?.equipment ?? 0} equipment items
+                        </Badge>
+                      </div>
+                      {cat.description && (
+                        <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{cat.description}</p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-slate-600 hover:text-blue-600 cursor-pointer"
+                        onClick={() => startEditCategory(cat)}
+                      >
+                        <Edit className="h-3.5 w-3.5 mr-1" /> Edit
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={(cat._count?.equipment ?? 0) > 0 || deleteCategoryMutation.isPending}
+                        title={(cat._count?.equipment ?? 0) > 0 ? "Cannot delete category with associated equipment" : "Delete category"}
+                        className="h-7 px-2 text-rose-600 hover:text-rose-700 disabled:opacity-40 cursor-pointer"
+                        onClick={() => deleteCategoryMutation.mutate(cat.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </Modal>
     </div>
