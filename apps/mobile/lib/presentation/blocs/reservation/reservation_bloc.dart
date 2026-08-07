@@ -6,6 +6,7 @@ import 'reservation_state.dart';
 
 class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
   final ReservationRemoteDatasource datasource;
+  String? _currentStatusFilter;
 
   ReservationBloc({required this.datasource}) : super(ReservationInitial()) {
     on<ReservationFetchRequested>(_onReservationFetchRequested);
@@ -21,6 +22,8 @@ class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
     ReservationFetchRequested event,
     Emitter<ReservationState> emit,
   ) async {
+    _currentStatusFilter = event.statusFilter;
+
     if (!event.isRefresh) {
       emit(ReservationLoading());
     }
@@ -70,7 +73,7 @@ class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
     try {
       await datasource.cancelReservation(event.reservationId);
       emit(const ReservationActionSuccess(message: 'Reservation cancelled successfully'));
-      add(const ReservationFetchRequested());
+      add(ReservationFetchRequested(statusFilter: _currentStatusFilter));
     } catch (e) {
       emit(ReservationFailure(message: 'Failed to cancel reservation: $e'));
     }
@@ -83,7 +86,7 @@ class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
     try {
       await datasource.approveReservation(event.reservationId, notes: event.notes);
       emit(const ReservationActionSuccess(message: 'Reservation approved successfully'));
-      add(const ReservationFetchRequested());
+      add(ReservationFetchRequested(statusFilter: _currentStatusFilter));
     } catch (e) {
       emit(ReservationFailure(message: 'Failed to approve reservation: $e'));
     }
@@ -96,7 +99,7 @@ class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
     try {
       await datasource.rejectReservation(event.reservationId, reason: event.reason);
       emit(const ReservationActionSuccess(message: 'Reservation rejected successfully'));
-      add(const ReservationFetchRequested());
+      add(ReservationFetchRequested(statusFilter: _currentStatusFilter));
     } catch (e) {
       emit(ReservationFailure(message: 'Failed to reject reservation: $e'));
     }
@@ -109,7 +112,7 @@ class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
     try {
       await datasource.activateReservation(event.reservationId);
       emit(const ReservationActionSuccess(message: 'Pickup activated successfully'));
-      add(const ReservationFetchRequested());
+      add(ReservationFetchRequested(statusFilter: _currentStatusFilter));
     } catch (e) {
       emit(ReservationFailure(message: 'Failed to activate pickup: $e'));
     }
@@ -122,7 +125,7 @@ class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
     try {
       await datasource.returnReservation(event.reservationId, notes: event.notes);
       emit(const ReservationActionSuccess(message: 'Return processed successfully'));
-      add(const ReservationFetchRequested());
+      add(ReservationFetchRequested(statusFilter: _currentStatusFilter));
     } catch (e) {
       emit(ReservationFailure(message: 'Failed to process return: $e'));
     }

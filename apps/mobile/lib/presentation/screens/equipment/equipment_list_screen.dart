@@ -51,6 +51,16 @@ class _EquipmentListScreenState extends State<EquipmentListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Browse Equipment'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
       ),
       body: Column(
         children: [

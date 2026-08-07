@@ -89,7 +89,7 @@ class ReservationRemoteDatasource {
   Future<ReservationModel> rejectReservation(String id, {required String reason}) async {
     final response = await dioClient.dio.patch(
       '/reservations/$id/reject',
-      data: {'reason': reason},
+      data: {'rejectionReason': reason},
     );
     final data = response.data['data'] ?? response.data;
     return ReservationModel.fromJson(data);

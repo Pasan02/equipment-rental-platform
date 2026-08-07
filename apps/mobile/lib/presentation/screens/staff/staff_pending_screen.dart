@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../domain/entities/reservation_entity.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/auth/auth_state.dart';
 import '../../blocs/reservation/reservation_bloc.dart';
 import '../../blocs/reservation/reservation_event.dart';
 import '../../blocs/reservation/reservation_state.dart';
@@ -298,16 +300,27 @@ class _StaffPendingScreenState extends State<StaffPendingScreen> {
                     ),
                   ],
                   if (item.status == 'APPROVED') ...[
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.check_circle_outline, size: 18),
-                      label: const Text('Activate Pickup'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.statusActive,
-                      ),
-                      onPressed: () {
-                        context
-                            .read<ReservationBloc>()
-                            .add(ReservationActivateRequested(item.id));
+                    BlocBuilder<AuthBloc, AuthState>(
+                      builder: (context, authState) {
+                        final currentUser = (authState is Authenticated) ? authState.user : null;
+                        final isWarehouseOnly = currentUser != null && currentUser.role == 'WAREHOUSE';
+
+                        if (isWarehouseOnly) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return ElevatedButton.icon(
+                          icon: const Icon(Icons.check_circle_outline, size: 18),
+                          label: const Text('Activate Pickup'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.statusActive,
+                          ),
+                          onPressed: () {
+                            context
+                                .read<ReservationBloc>()
+                                .add(ReservationActivateRequested(item.id));
+                          },
+                        );
                       },
                     ),
                   ],

@@ -50,6 +50,16 @@ class _ReservationsListScreenState extends State<ReservationsListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Reservations'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
       ),
       body: Column(
         children: [

@@ -5,6 +5,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/datasources/equipment_remote_datasource.dart';
 import '../../../domain/entities/equipment_entity.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/auth/auth_state.dart';
 
 class EquipmentDetailScreen extends StatefulWidget {
   final String equipmentId;
@@ -237,36 +239,47 @@ class _EquipmentDetailScreenState extends State<EquipmentDetailScreen> {
                           ),
                         ),
 
-                        // Bottom Reserve Action Bar
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            border: Border(
-                              top: BorderSide(color: AppColors.borderLight),
-                            ),
-                          ),
-                          child: SafeArea(
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: 50,
-                              child: ElevatedButton(
-                                onPressed: _equipment!.isAvailable
-                                    ? () {
-                                        context.push(
-                                          '/reservation/create?equipmentId=${_equipment!.id}',
-                                        );
-                                      }
-                                    : null,
-                                child: Text(
-                                  _equipment!.isAvailable
-                                      ? 'Reserve Equipment'
-                                      : 'Currently Unavailable',
-                                  style: const TextStyle(fontSize: 16),
+                        // Bottom Reserve Action Bar (Customer accounts only)
+                        BlocBuilder<AuthBloc, AuthState>(
+                          builder: (context, state) {
+                            final user = (state is Authenticated) ? state.user : null;
+                            final isStaffOrAdmin = user != null && (user.isStaff || user.isWarehouse || user.isAdmin);
+
+                            if (isStaffOrAdmin) {
+                              return const SizedBox.shrink();
+                            }
+
+                            return Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                border: Border(
+                                  top: BorderSide(color: AppColors.borderLight),
                                 ),
                               ),
-                            ),
-                          ),
+                              child: SafeArea(
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    onPressed: _equipment!.isAvailable
+                                        ? () {
+                                            context.push(
+                                              '/reservation/create?equipmentId=${_equipment!.id}',
+                                            );
+                                          }
+                                        : null,
+                                    child: Text(
+                                      _equipment!.isAvailable
+                                          ? 'Reserve Equipment'
+                                          : 'Currently Unavailable',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),

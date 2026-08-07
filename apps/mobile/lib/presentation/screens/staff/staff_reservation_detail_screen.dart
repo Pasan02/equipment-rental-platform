@@ -4,6 +4,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/datasources/reservation_remote_datasource.dart';
 import '../../../domain/entities/reservation_entity.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/auth/auth_state.dart';
 import '../../blocs/reservation/reservation_bloc.dart';
 import '../../blocs/reservation/reservation_event.dart';
 import '../../blocs/reservation/reservation_state.dart';
@@ -393,16 +395,27 @@ class _StaffReservationDetailScreenState
                   ],
                 );
               } else if (status == 'APPROVED') {
-                return ElevatedButton.icon(
-                  icon: const Icon(Icons.check_circle_outline),
-                  label: const Text('Activate Pickup'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.statusActive,
-                  ),
-                  onPressed: () {
-                    context.read<ReservationBloc>().add(
-                          ReservationActivateRequested(_reservation!.id),
-                        );
+                return BlocBuilder<AuthBloc, AuthState>(
+                  builder: (context, authState) {
+                    final currentUser = (authState is Authenticated) ? authState.user : null;
+                    final isWarehouseOnly = currentUser != null && currentUser.role == 'WAREHOUSE';
+
+                    if (isWarehouseOnly) {
+                      return const SizedBox.shrink();
+                    }
+
+                    return ElevatedButton.icon(
+                      icon: const Icon(Icons.check_circle_outline),
+                      label: const Text('Activate Pickup'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.statusActive,
+                      ),
+                      onPressed: () {
+                        context.read<ReservationBloc>().add(
+                              ReservationActivateRequested(_reservation!.id),
+                            );
+                      },
+                    );
                   },
                 );
               } else if (status == 'ACTIVE') {
