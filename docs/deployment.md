@@ -45,33 +45,41 @@ cp .env.example .env
 nano .env
 ```
 
-**Critical production changes:**
+**Production Environment Configuration (`.env`):**
 
 ```env
 NODE_ENV=production
 
-# Use strong, unique secrets (generate with: openssl rand -base64 32)
+# Server Ports
+PORT=3000
+WEB_PORT=3001
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api/v1
+
+# Docker Hub Username for production container images
+DOCKERHUB_USERNAME=yourdockerhub
+
+# JWT Authentication Secrets (generate using: openssl rand -base64 32)
 JWT_SECRET=your-production-jwt-secret-here
+JWT_EXPIRATION=15m
 JWT_REFRESH_SECRET=your-production-refresh-secret-here
+JWT_REFRESH_EXPIRATION=7d
 
-# Postgres credentials (change from defaults)
-POSTGRES_USER=erp_admin
-POSTGRES_PASSWORD=strong-db-password-here
-POSTGRES_DB=equipment_rental_db
-DATABASE_URL="postgresql://erp_admin:strong-db-password-here@postgres:5432/equipment_rental_db?schema=public"
+# Database Connection (AWS RDS / Azure PostgreSQL Flexible Server / Supabase)
+DATABASE_URL="postgresql://dbuser:strong-db-password@equipment-rental-db.cluster-xyz.us-east-1.rds.amazonaws.com:5432/equipment_rental_db?sslmode=require"
 
-# Redis
-REDIS_HOST=redis
+# Redis Cache Connection (AWS ElastiCache / Azure Cache for Redis / Upstash)
+REDIS_HOST=equipment-rental-redis.cache.amazonaws.com
 REDIS_PORT=6379
+REDIS_PASSWORD=your-redis-password
 
-# Storage (configure your S3/R2 bucket)
+# Cloud Storage (AWS S3 / Cloudflare R2)
 STORAGE_ENDPOINT=https://your-account.r2.cloudflarestorage.com
 STORAGE_ACCESS_KEY_ID=your-key
 STORAGE_SECRET_ACCESS_KEY=your-secret
 STORAGE_BUCKET_NAME=equipment-rental-bucket
 STORAGE_PUBLIC_URL=https://pub-your-bucket.r2.dev
 
-# SMTP (configure your email provider)
+# SMTP Email Configuration
 SMTP_HOST=smtp.your-provider.com
 SMTP_PORT=587
 SMTP_USER=your-email-user
@@ -83,15 +91,20 @@ SMTP_FROM="Equipment Rental <noreply@yourdomain.com>"
 
 ## Step 4: Deploy with Docker Compose
 
-### Option A: Build from Source (Small Teams / First Deploy)
+### Option A: Local / Staging Build from Source
+
+For dev/staging environments building images from local source code:
 
 ```bash
 docker compose up --build -d
 ```
 
-### Option B: Pull from Docker Hub (CI/CD Pipeline / Subsequent Deploys)
+### Option B: Cloud Production Deployment (Managed DB / Docker Hub)
+
+For production deployments fetching pre-built images from Docker Hub and connecting to cloud managed database (AWS RDS / Azure Flexible Server):
 
 ```bash
+# Load environment variables and pull pre-built production images
 export DOCKERHUB_USERNAME=yourdockerhub
 
 docker compose -f docker/docker-compose.prod.yml pull
@@ -103,11 +116,11 @@ docker compose -f docker/docker-compose.prod.yml up -d
 ## Step 5: Run Database Migrations & Seed
 
 ```bash
-# Apply all Prisma migrations
-docker compose exec -T api npx prisma migrate deploy
+# Apply all Prisma migrations to target database (AWS RDS / Azure Flexible Server)
+docker compose -f docker/docker-compose.prod.yml exec -T api npx prisma migrate deploy
 
 # Seed initial data (admin user, sample categories, equipment)
-docker compose exec -T api npx prisma db seed
+docker compose -f docker/docker-compose.prod.yml exec -T api npx prisma db seed
 ```
 
 ---
@@ -115,17 +128,17 @@ docker compose exec -T api npx prisma db seed
 ## Step 6: Verify Deployment
 
 ```bash
-# Check all containers are healthy
-docker compose ps
+# Check running container health
+docker compose -f docker/docker-compose.prod.yml ps
 
 # Test API health endpoint
 curl http://localhost:3000/api/v1/health
 
 # Expected response:
-# {"status":"ok","timestamp":"2026-08-07T14:00:00.000Z","uptime":42.5}
+# {"status":"ok","timestamp":"2026-08-08T10:00:00.000Z","uptime":12.5}
 ```
 
-**Service URLs:**
+**Service Endpoints:**
 
 | Service | URL |
 |---------|-----|
@@ -135,9 +148,9 @@ curl http://localhost:3000/api/v1/health
 
 ---
 
-## Step 7: Set Up Reverse Proxy (Optional but Recommended)
+## Step 7: Set Up Reverse Proxy with Nginx & SSL
 
-For production, use Nginx as a reverse proxy with SSL:
+For production HTTPS encryption:
 
 ```nginx
 server {
@@ -167,7 +180,7 @@ server {
 }
 ```
 
-Add SSL with Certbot:
+Enable SSL via Certbot:
 ```bash
 sudo apt install certbot python3-certbot-nginx
 sudo certbot --nginx -d api.yourdomain.com -d app.yourdomain.com
@@ -177,23 +190,19 @@ sudo certbot --nginx -d api.yourdomain.com -d app.yourdomain.com
 
 ## Updating the Deployment
 
-When deploying new code changes:
+When deploying code updates via CI/CD:
 
 ```bash
 cd /opt/equipment-rental-platform
 
-# Pull latest code (if building from source)
-git pull origin main
-docker compose up --build -d
-
-# OR pull latest Docker Hub images (if using CI/CD)
+# Pull latest Docker Hub images
 docker compose -f docker/docker-compose.prod.yml pull
 docker compose -f docker/docker-compose.prod.yml up -d
 
-# Apply any new migrations
-docker compose exec -T api npx prisma migrate deploy
+# Apply database migrations
+docker compose -f docker/docker-compose.prod.yml exec -T api npx prisma migrate deploy
 
-# Clean up old images
+# Clean up dangling images
 docker image prune -f
 ```
 
@@ -203,13 +212,15 @@ docker image prune -f
 
 ```bash
 # View all container logs
-docker compose logs -f
+docker compose -f docker/docker-compose.prod.yml logs -f
 
-# View specific service logs
-docker compose logs -f api
-docker compose logs -f web
+# View API logs
+docker compose -f docker/docker-compose.prod.yml logs -f api
 
-# Check container resource usage
+# View Web logs
+docker compose -f docker/docker-compose.prod.yml logs -f web
+
+# Check container resource utilization
 docker stats
 ```
 
@@ -219,8 +230,8 @@ docker stats
 
 | Issue | Solution |
 |-------|---------|
-| API container exits immediately | Check logs: `docker compose logs api`. Verify `DATABASE_URL` points to `postgres` hostname (not `localhost`). |
-| Database connection refused | Ensure PostgreSQL container is healthy: `docker compose ps`. Wait for health check to pass before starting API. |
-| Web app shows blank page | Verify `NEXT_PUBLIC_API_URL` environment variable is set correctly. |
-| Redis connection error | Ensure `REDIS_HOST=redis` (container name, not `localhost`) in production. |
-| Port already in use | Stop existing services: `docker compose down`. Check with `lsof -i :3000`. |
+| API container exits immediately | Check logs: `docker compose logs api`. Ensure `DATABASE_URL` is set correctly in `.env` and accessible from cloud server. |
+| Database SSL connection error | Ensure `?sslmode=require` is appended to `DATABASE_URL` for AWS RDS or Azure Flexible Server. |
+| Web app cannot fetch API data | Verify `NEXT_PUBLIC_API_URL` environment variable matches your public API URL. |
+| Redis connection timeout | Check security group / firewall rules for AWS ElastiCache or Azure Cache endpoint. |
+| Port in use error | Check active ports with `sudo lsof -i :3000` or `sudo lsof -i :3001`. |
