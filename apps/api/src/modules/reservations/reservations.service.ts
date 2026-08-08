@@ -19,12 +19,17 @@ import { ApproveReservationDto } from './dto/approve-reservation.dto';
 import { RejectReservationDto } from './dto/reject-reservation.dto';
 import { ReturnReservationDto } from './dto/return-reservation.dto';
 
+import { NotificationsService } from '../notifications/notifications.service';
+import { MailService } from '../notifications/services/mail.service';
+
 @Injectable()
 export class ReservationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly equipmentService: EquipmentService,
     private readonly activityLogsService: ActivityLogsService,
+    private readonly notificationsService: NotificationsService,
+    private readonly mailService: MailService,
   ) {}
 
   /**
@@ -381,6 +386,28 @@ export class ReservationsService {
         newValues: { status: ReservationStatus.APPROVED, approvedBy: staffId },
       });
 
+      // Dispatch in-app and email notifications asynchronously
+      try {
+        await this.notificationsService.createNotification(
+          updated.customerId,
+          'Reservation Approved',
+          `Your reservation ${updated.reservationNumber} has been approved.`,
+          'RESERVATION_APPROVED',
+        );
+        await this.mailService.sendReservationApprovedEmail(
+          updated.customer.email,
+          {
+            customerName: `${updated.customer.firstName} ${updated.customer.lastName}`,
+            reservationNumber: updated.reservationNumber,
+            totalAmount: Number(updated.totalAmount),
+            pickupDate: updated.pickupDate.toISOString().slice(0, 10),
+            returnDate: updated.returnDate.toISOString().slice(0, 10),
+          },
+        );
+      } catch (_err) {
+        // Notification failure should not roll back database transaction
+      }
+
       return updated;
     });
   }
@@ -421,6 +448,26 @@ export class ReservationsService {
         rejectionReason: dto.rejectionReason,
       },
     });
+
+    // Dispatch in-app and email notifications asynchronously
+    try {
+      await this.notificationsService.createNotification(
+        updated.customerId,
+        'Reservation Rejected',
+        `Your reservation ${updated.reservationNumber} was rejected: ${dto.rejectionReason}`,
+        'RESERVATION_REJECTED',
+      );
+      await this.mailService.sendReservationRejectedEmail(
+        updated.customer.email,
+        {
+          customerName: `${updated.customer.firstName} ${updated.customer.lastName}`,
+          reservationNumber: updated.reservationNumber,
+          rejectionReason: dto.rejectionReason,
+        },
+      );
+    } catch (_err) {
+      // Notification failure should not fail response
+    }
 
     return updated;
   }

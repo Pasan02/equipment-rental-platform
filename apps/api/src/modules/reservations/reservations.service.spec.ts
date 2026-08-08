@@ -14,6 +14,9 @@ import { EquipmentService } from '../equipment/equipment.service';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 import { ReservationsService } from './reservations.service';
 
+import { NotificationsService } from '../notifications/notifications.service';
+import { MailService } from '../notifications/services/mail.service';
+
 describe('ReservationsService', () => {
   let service: ReservationsService;
 
@@ -43,6 +46,15 @@ describe('ReservationsService', () => {
     createLog: jest.fn().mockResolvedValue({}),
   };
 
+  const mockNotificationsService = {
+    createNotification: jest.fn().mockResolvedValue({}),
+  };
+
+  const mockMailService = {
+    sendReservationApprovedEmail: jest.fn().mockResolvedValue(true),
+    sendReservationRejectedEmail: jest.fn().mockResolvedValue(true),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -50,6 +62,8 @@ describe('ReservationsService', () => {
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: EquipmentService, useValue: mockEquipmentService },
         { provide: ActivityLogsService, useValue: mockActivityLogsService },
+        { provide: NotificationsService, useValue: mockNotificationsService },
+        { provide: MailService, useValue: mockMailService },
       ],
     }).compile();
 

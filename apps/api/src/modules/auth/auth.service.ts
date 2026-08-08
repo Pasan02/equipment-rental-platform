@@ -19,6 +19,8 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
+import { MailService } from '../notifications/services/mail.service';
+
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
@@ -27,6 +29,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   /**
@@ -205,7 +208,11 @@ export class AuthService {
       );
 
       this.logger.log(`Password reset requested for email: ${user.email}`);
-      // In production, nodemailer sends an email with the link `https://app/reset-password?token=${resetToken}`
+      const webUrl =
+        this.configService.get<string>('cors.origins')?.[1] ||
+        'http://localhost:3001';
+      const resetUrl = `${webUrl}/reset-password?token=${resetToken}`;
+      await this.mailService.sendPasswordResetEmail(user.email, resetUrl);
     }
 
     // Always return success response to prevent email enumeration
@@ -243,7 +250,7 @@ export class AuthService {
       payload = this.jwtService.verify(resetPasswordDto.token, {
         secret: resetSecret,
       });
-    } catch (error) {
+    } catch (_error) {
       throw new BadRequestException('Invalid or expired password reset token');
     }
 

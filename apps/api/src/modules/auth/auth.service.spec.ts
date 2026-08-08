@@ -5,6 +5,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserRole } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuthService } from './auth.service';
+import { MailService } from '../notifications/services/mail.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -41,6 +42,11 @@ describe('AuthService', () => {
     }),
   };
 
+  const mockMailService = {
+    sendPasswordResetEmail: jest.fn().mockResolvedValue(true),
+    sendEmail: jest.fn().mockResolvedValue(true),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -48,6 +54,7 @@ describe('AuthService', () => {
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: JwtService, useValue: mockJwtService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: MailService, useValue: mockMailService },
       ],
     }).compile();
 
